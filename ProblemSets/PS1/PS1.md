@@ -1,7 +1,7 @@
 ---
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
 # Problem Set 1
 
@@ -47,7 +47,7 @@ The data were consolidated from a 100% sample taken from birth records in US sta
 5. Include at least one key visualization of the data that exhibits an interesting characteristic.
 
 
-![optional caption text](Fathersageandeducation.png)
+![Father's Education and Age at Childbirth, 2016](Fathersageandeducation.png)
 
 
 
