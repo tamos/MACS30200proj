@@ -1,3 +1,8 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
 # Problem Set 1
 
 ### MACSS 30200
@@ -10,17 +15,41 @@ _Tyler Amos_
 
 1. Describe how to access data, where it is stored, who curates it. Make sure to use the original source and curator in addition to the NBER site to which I have linked.
 
+Access: This dataset can be downloaded from the Centers for Disease Control and Prevention (CDC) website (www.cdc.gov) as a compressed (e.g., .zip, .dat.Z) file. A derivation of this dataset is also available from the National Bureau of Economic Research website (www.nber.org) in a variety of formats (e.g., Stata, SAS).
+
+Curation: The data is curated in its original source by the CDC through the National Center for Health Statistics' National Vital Statistics System. The National Bureau of Economic Research curates the derived datasets. 
+
 
 2. Cite other key papers that have used this data.
 
+Shih, Tiffany, Desi Peneva, Xiao Xu, Amelia Sutton, Elizabeth Triche, Richard A. Ehrenkranz, Michael Paidas, and Warren Stevens. "The rising burden of preeclampsia in the United States impacts both maternal and child health." American journal of perinatology 33, no. 04 (2016): 329-338.
+
+Shahabi, Ahva, Desi Peneva, Devin Incerti, Kimmie McLaurin, and Warren Stevens. "Assessing variation in the cost of palivizumab for respiratory syncytial virus prevention in preterm infants." PharmacoEconomics-open 2, no. 1 (2018): 53-61.
+
+DeLeire, Thomas, Leonard M. Lopoo, and Kosali I. Simon. "Medicaid expansions and fertility in the United States." Demography 48, no. 2 (2011): 725-747.
+
+Walton, Emily. "Residential segregation and birth weight among racial and ethnic minorities in the United States." Journal of health and social behavior 50, no. 4 (2009): 427-442.
+
+Lopoo, Leonard M., and Thomas DeLeire. "Did welfare reform influence the fertility of young teens?." Journal of Policy Analysis and Management 25, no. 2 (2006): 275-298.
+
+Henshaw, Stanley K., and Dina J. Feivelson. "Teenage abortion and pregnancy statistics by state, 1996." Family Planning Perspectives (2000): 272-280.
+
+
 
 3. Describe how the data were collected.
+
+The data were consolidated from a 100% sample taken from birth records in US states. 
 
 
 4. Include a table that gives descriptive statistics for at least 8 key variables (you can do more).
 
 
 5. Include at least one key visualization of the data that exhibits an interesting characteristic.
+
+
+![optional caption text](Fathersageandeducation.png)
+
+
 
 
 6. Show at least one conditional (slice) description of the data (e.g., all variable descriptive statistics by nationality of survey respondent). This can be a table or visualization.
