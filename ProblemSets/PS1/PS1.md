@@ -13,11 +13,11 @@ _Tyler Amos_
 
 ## Data Description
 
-1. Describe how to access data, where it is stored, who curates it. Make sure to use the original source and curator in addition to the NBER site to which I have linked.
-
 Access: This dataset can be downloaded from the Centers for Disease Control and Prevention (CDC) website (www.cdc.gov) as a compressed (e.g., .zip, .dat.Z) file. A derivation of this dataset is also available from the National Bureau of Economic Research website (www.nber.org) in a variety of formats (e.g., Stata, SAS).
 
 Curation: The data is curated in its original source by the CDC through the National Center for Health Statistics' National Vital Statistics System. The National Bureau of Economic Research curates the derived datasets. 
+
+Previous studies have used this data to study...
 
 
 2. Cite other key papers that have used this data.
@@ -35,24 +35,63 @@ Lopoo, Leonard M., and Thomas DeLeire. "Did welfare reform influence the fertili
 Henshaw, Stanley K., and Dina J. Feivelson. "Teenage abortion and pregnancy statistics by state, 1996." Family Planning Perspectives (2000): 272-280.
 
 
-
 3. Describe how the data were collected.
 
 The data were consolidated from a 100% sample taken from birth records in US states. 
 
 
-4. Include a table that gives descriptive statistics for at least 8 key variables (you can do more).
+### Descriptive Statistics
+
+_Outliers and missing data have been removed._
+
+#### Numeric Variables
+
+| Code  | Description  | Max | Min | Std | Mean | 
+|---|---|---|---|---| --- |
+|`dob_tt`   | Time of Birth in minutes elapsed that day | 2400 |  0  |  640 | 1231 |  
+| `mager`   | Mother's age in years | 50|  12  |  5.8 | 28.7 |  
+| `fagecomb`   | Father's age in years | 98 |  11  |  22.7 | 39.5 |  
+| `priorlive`   | Number of children by the same mother who are still living | 21 |  0  |  4.6 | 1.3 |
+
+#### Categorical Variables
+
+| Code  | Description  | Mode | Visualization | 
+|---|---|---|---|
+| `dob_mm`   | Month of Birth | August |  Distribution of Births by Month  |
+| `dob_wk`   | Day of the Week of Birth | Tuesday |  Distribution of Births by Day of the Week  |
+| `meduc`   | Mother's Educational Attainment | High School Graduate/GED |  Mother's Educational Attainment  |
+| `feduc`   | Father's Educational Attainment | High School Graduate/GED |  Father's Educational Attainment  |
+
+One trend which is most apparent from exploratory analysis is the role sex plays in determining the timing of children relative to educational attainment. 
+
+![Note that while higher levels of education appears to delay fatherhood, this is not strictly true in the upper age ranges. ](Fathersageandeducation.png)
 
 
-5. Include at least one key visualization of the data that exhibits an interesting characteristic.
+![Here we can see clearly that while mothers' data displays the same trend with respect to educational attainment as fathers', the ceiling on women's fertility around the age of 50 is apparent. ](Mothersageandeducation.png)
 
-
-![Father's Education and Age at Childbirth, 2016](Fathersageandeducation.png)
-
-
-
+####  Disaggregation by Education Across Selected Variables
 
 6. Show at least one conditional (slice) description of the data (e.g., all variable descriptive statistics by nationality of survey respondent). This can be a table or visualization.
+
+#### Sliced Data by Mother's Educational Attainment
+
+![Number of Living Children and Mother's Education ](Priorliveandeducation.png)
+
+![Mother's Age and Education ](Mothersageandeducation.png)
+
+
+![Mother and Father's Education ](FatherandMothereducation.png)
+
+![Birth Time and Mother's Education ](Birthtimeandeducation.png)
+
+![Birth Day and Mother's Education ](Birthdayandeducation.png)
+
+![Birth Month and Mother's Education ](Birthmonthandeducation.png)
+
+
+![Father's Age and Mother's Education ](Fathersageandmotherseducation.png)
+
+
 
 
 ## Research Paper Critique
