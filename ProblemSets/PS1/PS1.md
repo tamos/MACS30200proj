@@ -92,7 +92,7 @@ Link: http://nber.org/natality/2016/natl2016.csv.zip
 
 ## Appendix: Visualizations
 
-All Replication code for these visualizations is available at:
+_Replication code for these visualizations is available at:_
 
 https://github.com/tamos/MACS30200proj/tree/master/ProblemSets/PS1
 
