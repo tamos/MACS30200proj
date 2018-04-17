@@ -15,7 +15,7 @@ _Tyler Amos_
 
 This dataset contains records of live births in the United States for the year 2016. A live birth is defined as "every product of conception that gives a sign of life after birth" (CDC 2016). Along with various demographic data (e.g., mother's race, education) the datset includes details of the infant's health and any medical conditions.
 
-_Access:_ This dataset can be downloaded from the Centers for Disease Control and Prevention (CDC) website (www.cdc.gov) as a compressed (e.g., .zip, .dat.Z) file. A derivation of this dataset is also available from the National Bureau of Economic Research website (www.nber.org) in a variety of formats (e.g., Stata, SAS).
+_Access:_ This dataset can be downloaded from the Centers for Disease Control and Prevention (CDC) website (www.cdc.gov) as a compressed (e.g., .zip, .dat.Z) file. A derivation of this dataset is also available from the National Bureau of Economic Research (NBER) website (www.nber.org) in a variety of formats (e.g., Stata, SAS).
 
 _Curation:_ The data is curated in its original source by the CDC through the National Center for Health Statistics' National Vital Statistics System. The National Bureau of Economic Research curates the derived datasets. 
 
