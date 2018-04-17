@@ -9,7 +9,7 @@ output:
 
 _Tyler Amos_
 
-17-Apr-2018
+17-Apr-2018 (Submitted with approved 24-hour extension)
 
 # Data Description
 
@@ -92,7 +92,9 @@ Link: http://nber.org/natality/2016/natl2016.csv.zip
 
 ## Appendix: Visualizations
 
-All Replication code for these visualizations is available at: https://github.com/tamos/MACS30200proj/tree/master/ProblemSets/PS1
+All Replication code for these visualizations is available at:
+
+https://github.com/tamos/MACS30200proj/tree/master/ProblemSets/PS1
 
 ![Note the majority of births occur at the end and beginning of the year. ](Birthbymonth.png)
 
