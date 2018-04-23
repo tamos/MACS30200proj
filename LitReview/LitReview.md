@@ -79,7 +79,7 @@ Moving forward, research which can address one or more of these points will fill
 title: "Computational Models For Simulating Forced Migration: An Overview of Leading Methods"
 author: Tyler Amos
 date: 23 April 2018
-abstract: "This review examines current and emergent research in simulating forced migration, with an eye to real-world applications. It examines the gravity and radiation models, random walks and agent-based models, and provides suggestions for future research to be relevant for humanitarian practice."
+abstract: "This review examines current and emergent research in simulating forced migration, with an eye to real-world applications. It examines gravity and radiation models, random walks and agent-based models, and provides suggestions for future research to be relevant for humanitarian practice."
 
 bibliography: Simulating-Displacement-LitReview.bib
     
