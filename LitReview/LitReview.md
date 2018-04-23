@@ -70,7 +70,7 @@ Current quantitative research on forced migration is dominated by macro and caus
       
   iv) _Be robust to the displaced populations' legal status:_ While different to some extent, the experiences of refugees and internally displaced people have many commonalities. The distinction is primarily legal. ^[For this reason, this review has not distinguished between these two populations. See Loescher et al. [-@loescher2008united] for more nuance on this issue.] Models should therefore be robust across both internally displaced and refugee populations. 
 
-Moving forward, research which can address one or more of these points will fill important extant gaps in the forced migration literature. Moreover, it will be addressing an important ethical imperative - research which focuses on negative human experiences must in some way contribute to alleviating or preventing that experience. ^[This point was first made to the author in 2013 by James Milner during an undergraduate seminar at Carleton University.]
+Research which can address one or more of these points will fill important extant gaps in the forced migration literature. Moreover, it will be addressing an important ethical imperative - research which focuses on negative human experiences must in some way contribute to alleviating or preventing that experience. ^[This point was first made to the author in 2013 by James Milner during an undergraduate seminar at Carleton University.]
 
 \newpage
 # References
