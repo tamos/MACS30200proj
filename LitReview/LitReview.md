@@ -1,6 +1,6 @@
 ## The Push-Pull Paradigm
 
-One way migration is often studied is as the product of push and pull factors. Push factors drive individuals to leave locations, while pull factors attract them to others. [@edscott] Within forced migration studies, there is an abundance of qualitative and normative literature exploring these factors. However, compared to studies of commuting and econometric models of trade there are relatively few empirical studies employing models, and even fewer simulation-based studies of forced migration.
+One way migration is often studied is as the product of push and pull factors. Push factors drive individuals to leave locations, while pull factors attract them to others. [@edscott] Within forced migration studies, there is an abundance of qualitative and normative literature exploring these factors. However, compared to studies of commuting and econometric models of trade there are relatively few empirical studies employing formal models, and even fewer simulation-based studies of forced migration.
 
 ## Structure of the Review
 
