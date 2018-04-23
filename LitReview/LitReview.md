@@ -4,7 +4,7 @@ One way migration is often studied is as the result of push and pull factors. Pu
 
 ## Structure of the Review
 
-This review proceeds in three parts. First, it outlines two leading models from migration studies and economics. Second, it explores the viability of simulation in general, as well as two specific types of simulation, in modelling and forecasting features of displacement events. Third, it concludes with an outline for how future research may judged in terms of its usefulness to practitioners. 
+This review proceeds in three parts. First, it outlines two leading models from migration studies and economics. Second, it explores the viability of simulation in general, as well as two specific types of simulation, in modelling and forecasting features of displacement events. Third, it concludes with an outline for how future research may judged in terms of its utility for practitioners. 
 
 ### The Gravity Model
 
@@ -13,7 +13,7 @@ The most prominent of formal migration models is the gravity model. First used t
 (@gravity) $$ I_{i,j} = \frac{f(R_i, A_j)}{f(D_{i,j})} $$
 Where $I$ is the interaction between locations $i$ and $j$, determined by $R_i$, repelling forces at location $i$ and $A_j$, attraction at location $j$. $D_{i,j}$ is the distance between locations $i$ and $j$. [@edwardschaos pp 21] ^[See @simini2012universal for a concise description of both the gravity and radiation models.]
 
-For its robustness across a number of applications, long history, and appealing simplicity, the gravity model overemphasizes macro trends. [@edwardschaos pp 21] Simini et al. [-@simini2012universal] identify a number of further issues: i) the wide latitude available in determining the cost function $f(D_{i,j})$; ii)  poor predictive performance in certain applications; iii) an over-reliance on population, and; iv) a number of free parameters. These, and other points, are addressed by an alternative which draws from another physics metaphor - the radiation model. ^[Other alternatives exist, such as the intervening opportunity or random utility models. [@simini2012universal]]
+For its robustness across a number of applications, long history, and appealing simplicity, the gravity model's shortcomings are numerous. For one, it overemphasizes macro trends. [@edwardschaos pp 21] Simini et al. [-@simini2012universal] identify a number of further issues: i) the wide latitude available in determining the cost function $f(D_{i,j})$; ii)  poor predictive performance in certain applications; iii) an over-reliance on population, and; iv) a number of free parameters. These points and others are addressed by an alternative which draws from another physics metaphor - radiation. ^[Other alternatives exist, such as the intervening opportunity or random utility models. [@simini2012universal]]
 
 ### The Radiation Model
 
@@ -32,7 +32,7 @@ The rationality assumption can be a useful approximation of human decision-makin
 
 ### Robustness to Reality and Relaxing the Rationality Assumption
 
-In search of greater robustness, some mixed models use elements of the above models with new approaches from areas such as network theory. An informal variant bears some similarities to the gravity model. In this model, the attractiveness of a location is determined by presence of more migrant individuals at a given location. As more migrant individuals arrive, that location gains more attractiveness because of the social ties between the origin and destination. [@lindstrompioneer; @GaripAsad] More formal alternatives combine heuristics based on formal models from the push-pull paradigm with network or graph models. [@ahmed2016multi; @suleimenova2017generalized] Edwards [-@edwardschaos] explores ways to account for a relaxed rationality assumption in detail, presenting an agent-based model on a generic lattice which combines elements of macro models (e.g., gravity) and observations from research at the micro level like the limitations of the rational choice assumption (e.g., informational assymmetry). Most recently, Suleimanova et al. [-@suleimenova2017generalized] do not relax the rationality assumption of the agent, but instead develop a network based on a network of real-world locations and events which agents traverse in a simulation according to a set of rules inspired in part by the gravity model (@gravity). 
+In search of greater robustness, some mixed models use elements of the above models with new approaches from areas such as network theory. In one informal variant, the attractiveness of a location is determined by its migrant population. As more migrant individuals arrive, that location gains more attractiveness because of the social ties between the origin and destination. [@lindstrompioneer; @GaripAsad] More formal alternatives combine heuristics based on formal models from the push-pull paradigm with network or graph models. [@ahmed2016multi; @suleimenova2017generalized] Edwards [-@edwardschaos] explores ways to account for a relaxed rationality assumption in detail, presenting an agent-based model on a generic lattice which combines elements of macro models (e.g., gravity) and observations from research at the micro level like the limitations of the rational choice assumption (e.g., informational assymmetry). Most recently, Suleimanova et al. [-@suleimenova2017generalized] do not relax the rationality assumption of the agent, but instead develop a network based on real locations and events which agents traverse in a simulation according to a set of rules inspired in part by the gravity model (@gravity). 
 
 ## Value of Simulation in Forced Migration Studies
 
@@ -56,30 +56,26 @@ For their apparent robustness, random walks have questionable theoretical value 
 
 Agent-based simulations require the modeller to specify all rules by which individuals make decisions. This makes explicit the connection between results and theory. In a displacement simulation, agents (a household or individual) move across a virtual space and interact with elements of the simulation according to some set of rules. ^[See @edwardschaos for an accessible explanation of agent-based models.] Beyond its proven ability to model a wide range of phenomena, this approach is intuitively understood by non-technical audiences and is relatively simple to implement. 
 
-Many of the critiques of simulation generally, such as those from Maldonado and Greenland [-@maldonadosimulationcritical] apply to agent-based models in particular. The rules by which agents "live" may be unreasonable simplifications or require bold assumptions which, in the worst case, limit simulation results' generalizability to just other simulations. This is notable given one of the reasons for choosing simulation methods is to manipulate virtual ecosystems to enhance understanding of real ones.
+Many of the critiques of simulation generally, such as those from Maldonado and Greenland [-@maldonadosimulationcritical] apply to agent-based models in particular. The rules by which agents "live" may be unreasonable simplifications or require bold assumptions which, in the worst case, limit simulation results' generalizability to just other simulations. This is notable given one of the reasons for choosing simulation methods is to manipulate virtual ecosystems that enhance understanding of reality.
 
 ### Macro Models, Micro Requirements
 
-Clearly formal models borrowed from economics (gravity, radiation), and simulation methods (random walks, agent-based models) have potential to produce valuable insights in forced migration studies. Yet there remain a number of gaps in this literature. Specifically, forced migration simulations mostly provide macro-level results with questionable generalizability. micro-level results with high generalizability would most benefit efforts to respond to crisis and conflict. Moving forward, what characteristics should models have in order to be relevant in this way?
+Clearly formal models borrowed from economics (gravity, radiation), and simulation methods (random walks, agent-based models) have potential to produce valuable insights in forced migration studies. Yet there remain a number of gaps in this literature. Specifically, forced migration simulations mostly provide macro-level results with questionable generalizability or practical value. Moving forward, what characteristics should models have in order to be relevant in this way?
+      
+  i) _Focus on actionable insights:_ A substantial amount of empirical work in this space focuses on  causal drivers of displacement. Researchers investigate how significant events, regimes, or geographical scope and intensity of conflict effect long-term movement patterns. [@schonj; @melanderoberg; @iqbal2007geo] These studies produce insightful results about broad displacement trends. However for practical purposes like humanitarian response, more granular results about volume and geographic distribution of displaced people in-country are valuable.
+      
+  ii) _Employ integrated models of displacement and return:_ To the author's knowledge, no empirical studies have examined displacement and return as integrated phenomena. Displacement is only part of the displaced individual's experience, and displaced people can and do return to their communities of origin. Needs persist from displacement through to return and so the ability to model the lifecyle of a displacement event is valuable. 
 
-  i) _Micro focus:_ Models must unpack phenomena with greater granularity. While intra-regional analyses of migration flows, such as Iqbal [-@iqbal2007geo] may provide useful insights for long-term planning, they do not contribute to preparedness or response within a given country.
-      
-  ii) _Focus on actionable insights:_ A substantial amount of empirical work in this space focuses on  causal drivers of displacement. Researchers investigate how significant events, regimes, or geographical scope and intensity of conflict effect movement patterns. [@schonj; @melanderoberg] These studies produce insightful results about broad displacement trends. However for practical purposes like humanitarian response, more specific results about volume and geographic distribution of displaced people in-country are valuable. 
-      
-  iii) _Employ integrated models of displacement and return:_ To the author's knowledge, no empirical studies have examined displacement and return as integrated phenomena. Displacement is only part of the displaced individual's experience, and displaced people can and do return to their communities of origin. Needs persist from displacement through to return and so the ability to model the lifecyle of a displacement event is valuable. 
-      
-  iv) _Be robust to the displaced populations' legal status:_  The experiences of refugees and internally displaced people have many commonalities. The distinction is primarily legal. ^[For this reason, this review has not distinguished between these two populations. See Loescher et al. [-@loescher2008united] for more nuance on this issue.] Models should therefore be robust across both internally displaced and refugee populations. 
-
-Research which can address one or more of these points will fill important extant gaps in the literature on forced migration simulation. Moreover, it will address an important ethical imperative - research which focuses on negative human experiences must in some way contribute to alleviating or preventing that experience. ^[This point was first made to the author in 2013 by James Milner during an undergraduate seminar at Carleton University.]
+Research which can address one or both of these points will fill important extant gaps in the literature on forced migration simulation. Moreover, it will address an important ethical imperative - research which focuses on negative human experiences must in some way contribute to alleviating or preventing that experience. ^[This point was first made to the author in 2013 by James Milner during an undergraduate seminar at Carleton University.]
 \newpage
 
 # References
 
 ---
-title: "Computational Models For Simulating Forced Migration: An Overview of Leading Methods"
+title: "Leading Models and Selected Implementations For Simulating Forced Migration: "
 author: Tyler Amos
 date: 23 April 2018
-abstract: "This methodological review examines current and emergent research in simulating forced migration, with an eye to real-world applications. It examines gravity and radiation models, random walks and agent-based implementations, and provides suggestions for future research to be relevant for humanitarian practice."
+abstract: "This methodological review explores current and emergent research in simulating forced migration, with an eye to real-world applications. It examines gravity and radiation models, random walks and agent-based implementations, and provides suggestions for future research to be relevant for humanitarian practice."
 
 bibliography: Simulating-Displacement-LitReview.bib
     
