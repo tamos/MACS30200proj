@@ -60,7 +60,7 @@ Many of the critiques of simulation generally, such as those from Maldonado and 
 
 ### Taking Stock: Macro Models, Micro Requirements
 
-Current, quantitative research on forced migration is dominated by macro and causal analyses, with unclear value for practice. Yet it is precisely this type of research that most benefits efforts to respond to crisis and conflict. Moving forward, what characteristics should models have in order to be relevant to practitioners?
+Current quantitative research on forced migration is dominated by macro and causal analyses, with unclear value for practice. Yet it is precisely this type of research that most benefits efforts to respond to crisis and conflict. Moving forward, what characteristics should models have in order to be relevant to practitioners?
 
   i) _Micro focus:_ Models must unpack phenomena with greater granularity. While intra-regional analyses of migration flows, such as Iqbal [-@iqbal2007geo] may provide useful insights for long-term planning, they do not contribute to preparedness or response within a given country.
       
