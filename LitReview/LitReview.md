@@ -22,7 +22,7 @@ In the radiation model proposed by Simini et al. [-@simini2012universal], an ind
 (@radiation) $$ T_{ij} = T_i \frac{m_i n_j}{(m_i + s_{ij}) (m_i + n_j + s_{ij})} $$
 Where locations $i$ and $j$ have populations of size $m$ and $n$. The distance between locations is represented by $r_{ij}$ and $s_{ij}$ is the total population in a circle with a radius $r_{ij}$. The centre of this circle is $i$, and the population $s_{ij}$ excludes $m + n$. $T_{ij}$ represents the total "flux" or commuting volume from location $i$ to location $j$. 
 
-In analyses comparing the radiation and gravity models using city-level commuting data, the radiation and gravity models offer similar results, but the radiation model has the additional advantage of being simpler and does not have free parameters. [@masuccigravityvsradiation; @simini2012universal] As a more recent proposal, new variations have been proposed, and there is potential for yet more improvement.^[See @siminiradiation2013]
+In analyses comparing the radiation and gravity models using city-level commuting data, the radiation and gravity models offer similar results, but the radiation model has the additional advantage of being simpler and does not have free parameters. [@masuccigravityvsradiation; @simini2012universal] As a relatively recent proposal, new variations have been proposed, and there is potential for yet more improvement.^[See @siminiradiation2013]
 
 ### Persistent Rationality Assumption
 
