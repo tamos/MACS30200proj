@@ -6,15 +6,16 @@ import matplotlib as mpl
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.cbook as cbook
+from analyze_graph import print_graph, print_graph_nx
 
 
 def go():
 	geog = InputGeography()
-	geog.ReadLocationsFromCSV('testing_locations_data.csv', 
-							name_col = 0,
-							population_col = 7 ,
-							gps_x_col = 4,
-							gps_y_col = 3)
+	geog.ReadLocationsFromCSV('location_data/locations_csv0.csv', 
+							name_col = 2,
+							population_col = 3 ,
+							gps_x_col = 1,
+							gps_y_col = 0)
 	geog.ReadLinksFromCSV(csv_name = 'routes.csv',
 							name1_col = 0,
 							name2_col = 1,
@@ -24,7 +25,8 @@ def go():
 	e = Ecosystem()
 	print("Ecosystem created\n")
 
-	end_time = 10
+	end_time = 32
+
 	print("End time is: {}".format(end_time))
 
 	e, lm = geog.StoreInputGeographyInEcosystem(e)
@@ -40,11 +42,29 @@ def go():
 	for i in lm_key:
 		if i not in res_list:
 			res_list[i] = []
+	err_list = {}
+	for i in lm_key:
+		if i not in err_list:
+			err_list[i] = []
 
 	for each_step in range(0,end_time):
 
 		# this should be a list of locations, we add one to each
 		# each agent will be a HH, based on outflow nums from IOM
+		num_tot = {}
+
+		with open('location_data/locations_csv' + str(each_step) + '.csv') as f:
+			try:
+				conflict_now, num_of = list(f.readline())[2:4]
+				num_tot[conflict_now] = num_of
+				e.add_conflict_zone(conflict_now)
+			except:
+				print("had issue ")
+
+
+		e.refresh_conflict_weights()
+
+
 		for each_agent in range(0, 100):
 			place = np.random.randint(0, len(lm_key))
 			e.addAgent(location=lm[lm_key[place]])
@@ -57,17 +77,31 @@ def go():
 
 		loc_list = []
 		for each_location, loc_obj in lm.items():
-			res_list[each_location].append(loc_obj.numAgents)
+			try:
+				res_list[each_location].append(loc_obj.numAgents)
+			except:
+				pass
+		for each_location,loc_obj in lm.items():
+			try:
+				error = abs(num_tot[each_location] - loc_obj.numAgents)
+				err_list[each_location].append(error)
+			except:
+				pass
 
 	results = pd.DataFrame(res_list)
 	#results.columns = lm_key
+	errors = pd.DataFrame(err_list)
 
 	results.to_csv('simulation_results.csv')
+
+	errors.to_csv('error_results.csv')
+
 	from plotter import read_datafile
 
 	data = read_datafile("simulation_results.csv")
 
-	x = data[:,0] # time
+
+'''	x = data[:,0] # time
 	y = data[:,1] # camp 22 (Mahama)
 	z = data[:,2] # third column for comparison
 
@@ -84,6 +118,10 @@ def go():
 	leg = ax1.legend()
 
 	plt.savefig('simres.png')
+
+	vert, edge = e.export_graph()
+
+	print_graph_nx(vert, edge, True)'''
 
 
 
