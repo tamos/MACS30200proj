@@ -1,5 +1,6 @@
 import sys
 import csv
+from flee.my_settings import *
 
 class SimulationSettings:
   Softening = 0.0
@@ -9,17 +10,17 @@ class SimulationSettings:
   InitLogLevel  = 0 # set to 1 for basic information on locations added and conflict zones assigned.
   TakeRefugeesFromPopulation = True
 
-  CampWeight = 2.0 # attraction factor for camps.
-  ConflictWeight = 0.25 # reduction factor for refugees entering conflict zones.
-  MinMoveSpeed = 200 # least number of km that we expect refugees to traverse per time step.
-  MaxMoveSpeed = 1000 # most number of km that we expect refugees to traverse per time step.
+  CampWeight = my_camp_weight # attraction factor for camps.
+  ConflictWeight = my_conflict_weight # reduction factor for refugees entering conflict zones.
+  MinMoveSpeed = my_min_move # least number of km that we expect refugees to traverse per time step.
+  MaxMoveSpeed = my_max_move # most number of km that we expect refugees to traverse per time step.
   UseDynamicCampWeights = True # overrides CampWeight depending on characteristics of the ecosystem.
   CapacityBuffer = 1.0
 
   #default move chances
-  ConflictMoveChance = 1.0
-  CampMoveChance = 0.001
-  DefaultMoveChance = 0.3
+  ConflictMoveChance = my_conflict_move_chance
+  CampMoveChance = my_camp_move_chance
+  DefaultMoveChance = my_default_move_chance
 
 
   AwarenessLevel = 1 #-1, no weighting at all, 0 = road only, 1 = location, 2 = neighbours, 3 = region.

@@ -11,6 +11,7 @@ from analyze_graph import print_graph, print_graph_nx
 
 
 def go():
+    
 	geog = InputGeography()
 	geog.ReadLocationsFromCSV('data/location_values_init.csv',							
 							name_col = 0,
@@ -97,7 +98,6 @@ def go():
 				pass
 
 	results = pd.DataFrame(res_list)
-	print(results.shape)
 
 	#results.columns = lm_key
 	truth = pd.read_csv('truth_vals.csv', skiprows =1, header = None)
@@ -107,7 +107,7 @@ def go():
 		result_val = results.iloc[:,i]/results.T.sum()[i]
 		errors.append(sum(abs(truth_val - result_val)))
 
-	print(errors)
+	return(list(zip(range(16), errors)))
 
 
 
@@ -115,4 +115,8 @@ def go():
 
 
 if __name__ == "__main__":
-	go()
+
+	from scipy.optimize import differential_evolution
+	res = go()
+	print("SUM OF ERRORS % IS {}".format(res))
+
