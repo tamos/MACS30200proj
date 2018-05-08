@@ -12,8 +12,8 @@ class SimulationSettings:
   CampWeight = 2.0 # attraction factor for camps.
   ConflictWeight = 0.25 # reduction factor for refugees entering conflict zones.
   MinMoveSpeed = 200 # least number of km that we expect refugees to traverse per time step.
-  MaxMoveSpeed = 200 # most number of km that we expect refugees to traverse per time step.
-  #UseDynamicCampWeights = True # overrides CampWeight depending on characteristics of the ecosystem.
+  MaxMoveSpeed = 1000 # most number of km that we expect refugees to traverse per time step.
+  UseDynamicCampWeights = True # overrides CampWeight depending on characteristics of the ecosystem.
   CapacityBuffer = 1.0
 
   #default move chances
@@ -24,7 +24,7 @@ class SimulationSettings:
 
   AwarenessLevel = 1 #-1, no weighting at all, 0 = road only, 1 = location, 2 = neighbours, 3 = region.
   UseDynamicAwareness = False # Refugees become smarter over time.
-  UseIDPMode = False
+  UseIDPMode = True
 
   def ReadFromCSV(csv_name):
     """

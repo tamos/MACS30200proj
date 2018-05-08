@@ -57,10 +57,15 @@ def go():
 		print("current conflict zones are", e.conflict_zone_names)
 
 		candidate_zone = conflict_locations[conflict_locations['round'] == each_step]
-		for i in set(candidate_zone.name):
+		new_conflicts = set(candidate_zone.name)
+		for i in new_conflicts:
 			if i not in e.conflict_zone_names:
 				e.add_conflict_zone(i)
-		print(e.conflict_zone_names)
+		peace_transition = [i for i in lm_key if i not in new_conflicts ]
+		for i in peace_transition:
+			e.remove_conflict_zone(i)
+		print("PEACE", peace_transition)
+		print("\nCONF:", e.conflict_zone_names)
 
 
 		num_tot = {}
