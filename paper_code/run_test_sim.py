@@ -52,7 +52,7 @@ def go():
 	conflict_locations = pd.read_csv('data/conflict_locations_by_round.csv')
 
 
-	for each_step in range(0,32):
+	for each_step in range(16):
 
 		print("current conflict zones are", e.conflict_zone_names)
 
@@ -97,12 +97,17 @@ def go():
 				pass
 
 	results = pd.DataFrame(res_list)
+	print(results.shape)
+
 	#results.columns = lm_key
-	errors = pd.DataFrame(err_list)
+	truth = pd.read_csv('truth_vals.csv', skiprows =1, header = None)
+	errors = []
+	for i in range(16):
+		truth_val = truth.iloc[:,i]/truth.T.sum()[i]
+		result_val = results.iloc[:,i]/results.T.sum()[i]
+		errors.append(sum(abs(truth_val - result_val)))
 
-	results.to_csv('simulation_results.csv')
-
-	errors.to_csv('error_results.csv')
+	print(errors)
 
 
 
