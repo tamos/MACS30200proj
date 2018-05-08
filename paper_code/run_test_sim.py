@@ -12,14 +12,14 @@ from analyze_graph import print_graph, print_graph_nx
 
 def go():
 	geog = InputGeography()
-	geog.ReadLocationsFromCSV('location_data/locations_csv_full.csv',							
-							name_col = 2,
+	geog.ReadLocationsFromCSV('data/location_values_init.csv',							
+							name_col = 0,
 							population_col = 3 ,
-							gps_x_col = 1,
-							gps_y_col = 0)
+							gps_x_col = 2,
+							gps_y_col = 1)
 
 
-	geog.ReadLinksFromCSV(csv_name = 'routes.csv',
+	geog.ReadLinksFromCSV(csv_name = 'data/routes_admin1.csv',
 							name1_col = 0,
 							name2_col = 1,
 							dist_col = 2)
@@ -28,9 +28,7 @@ def go():
 	e = Ecosystem()
 	print("Ecosystem created\n")
 
-	end_time = 32
-
-	print("End time is: {}".format(end_time))
+	#print("End time is: {}".format(end_time))
 
 	e, lm = geog.StoreInputGeographyInEcosystem(e)
 	print("Geography stored in Ecosystem")
@@ -50,17 +48,27 @@ def go():
 		if i not in err_list:
 			err_list[i] = []
 
-	for each_step in range(0,end_time):
-		print("conflict zones are", e.conflict_zone_names)
+	import pandas as pd
+	conflict_locations = pd.read_csv('data/conflict_locations_by_round.csv')
 
-		# this should be a list of locations, we add one to each
-		# each agent will be a HH, based on outflow nums from IOM
+
+	for each_step in range(0,32):
+
+		print("current conflict zones are", e.conflict_zone_names)
+
+		candidate_zone = conflict_locations[conflict_locations['round'] == each_step]
+		for i in set(candidate_zone.name):
+			if i not in e.conflict_zone_names:
+				e.add_conflict_zone(i)
+		print(e.conflict_zone_names)
+
+
 		num_tot = {}
 
 		e.refresh_conflict_weights()
 
 
-		for each_agent in range(0, 100):
+		for each_agent in range(0, 1000):
 			place = np.random.randint(0, len(lm_key))
 			e.addAgent(location=lm[lm_key[place]])
 
