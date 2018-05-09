@@ -63,9 +63,9 @@ def go(args):
 
 	import pandas as pd
 	conflict_locations = pd.read_csv('data/conflict_locations_by_round.csv')
+	num_rounds = len(set(conflict_locations['round']))
 
-
-	for each_step in range(16):
+	for each_step in range(num_rounds):
 
 		#print("current conflict zones are", e.conflict_zone_names)
 
@@ -83,12 +83,12 @@ def go(args):
 
 		num_tot = {}
 
-		e.refresh_conflict_weights()
 
-
-		for each_agent in range(0, 10):
+		for each_agent in range(0, 1000):
 			place = np.random.randint(0, len(lm_key))
 			e.addAgent(location=lm[lm_key[place]])
+
+		e.refresh_conflict_weights()
 
 		e.evolve()
 
@@ -98,28 +98,46 @@ def go(args):
 
 		loc_list = []
 		for each_location, loc_obj in lm.items():
-			try:
-				res_list[each_location].append(loc_obj.numAgents)
-			except:
-				pass
-		for each_location,loc_obj in lm.items():
-			try:
-				error = abs(num_tot[each_location] - loc_obj.numAgents)
-				err_list[each_location].append(error)
-			except:
-				pass
+			#try:
+			res_list[each_location].append(loc_obj.numAgents)
 
-	results = pd.DataFrame(res_list)
+			#except:
+			#	pass
+		#for each_location,loc_obj in lm.items():
+		#	try:
+		#		error = abs(num_tot[each_location] - loc_obj.numAgents)
+		#		err_list[each_location].append(error)
+		#	except:
+		#		pass
 
-	#results.columns = lm_key
-	truth = pd.read_csv('truth_vals.csv', skiprows =1, header = None)
-	errors = []
-	for i in range(16):
-		truth_val = truth.iloc[:,i]/truth.T.sum()[i]
-		result_val = results.iloc[:,i]/results.T.sum()[i]
-		errors.append(sum(abs(truth_val - result_val)))
+	results_df = pd.DataFrame(res_list)
+	results_df.to_csv('results_of_sim.csv')
+	results_val = results_df.iloc[-1,:]
+	results_denom = sum(results_val)
+	results_columns = list(results_df.columns)
 
-	return sum(errors)
+	truth_df = pd.read_csv('truth_vals.csv', skiprows =1, header = None)
+	truth_val = truth_df.iloc[-1, :]
+	truth_denom = sum(truth_val)
+	truth_columns = list(truth_df.columns)
+
+	truth_dict = dict(zip(truth_columns, truth_val/truth_denom))
+	result_dict = dict(zip(results_columns, results_val/results_denom))
+
+	error_list = []
+	error_places = []
+
+	for result_key, result_item in result_dict.items():
+		if result_key in truth_dict:
+		    error = abs(truth_dict[result_key] - result_item)
+		else:
+			error = result_item
+		print("for {}, error is {}".format(result_key, error))
+		error_list.append(error)
+		error_places.append(result_key)
+	pd.DataFrame([error_places, error_list]).T.to_csv('errors_results.csv')
+	return sum(error_list)
+
 
 
 if __name__ == "__main__":
@@ -133,21 +151,20 @@ if __name__ == "__main__":
 	from scipy.optimize import basinhopping
 	from scipy.optimize import brute, fmin
 
-	#minimizer_kwargs = {"method": "BFGS"}
+	minimizer_kwargs = {"method": "BFGS"}
 
-	#x0 = [2, 0.5, 300, 1000]#, 0.3, 0.4, 0.1]
+	x0 = [2, 0.5, 300, 1000, 0.3, 0.4, 0.1]
 
-	#ret = basinhopping(go, x0, 
-		#minimizer_kwargs=minimizer_kwargs,
-		#niter=3, disp = True)
+	ret = basinhopping(go, x0, 
+		minimizer_kwargs=minimizer_kwargs,
+		niter=3, disp = True)
 
-	rranges = (slice(0,1,0.25), slice(0, 1, 0.25),
-		       slice(10, 100, 5), slice(10, 1000, 100),
-		       slice(0, 1.0, 0.5), slice(0, 1.0, 0.5),
-		       slice(0, 1.0, 0.5))
-	ret = brute(go, rranges, disp = True)#,
+	#rranges = (slice(0,1,0.25), slice(0, 1, 0.25),
+	#	       slice(10, 100, 5), slice(10, 1000, 100),
+	#	       slice(0, 1.0, 0.5), slice(0, 1.0, 0.5),
+	#	       slice(0, 1.0, 0.5))
+	#ret = brute(go, rranges, disp = True)#,
 					#finish = fmin)
-	print(ret)
 
 	#ret = go([2, 0.5, 300, 1000, 0.1, 0.4, 0.1])
 	#print(ret)

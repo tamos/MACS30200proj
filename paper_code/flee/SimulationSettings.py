@@ -19,7 +19,7 @@ class SimulationSettings:
     AgentLogLevel = 0 # set to 1 for basic agent information.
     CampLogLevel = 0  # set to 1 to obtain average times for agents to reach camps at any time step (aggregate info).
     InitLogLevel  = 0 # set to 1 for basic information on locations added and conflict zones assigned.
-    TakeRefugeesFromPopulation = True
+    TakeRefugeesFromPopulation = False
 
     CampWeight = my_camp_weight # attraction factor for camps.
     ConflictWeight = my_conflict_weight # reduction factor for refugees entering conflict zones.
