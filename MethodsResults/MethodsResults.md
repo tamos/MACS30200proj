@@ -14,7 +14,7 @@ _Armed Conflict Location and Event Database (ACLED)_
 
 ACLED is an initiative which catalogues incidents of violence across a number of countries. ACLED data are frequently used by researchers studying conflict/crisis. For this simulation, ACLED data for Iraq were accessed from the Humanitarian Data Exchange portal's live update link as a CSV. [@humdata] 
 
-For each event, ACLED records the approximate location, date and time, estimated fatalities, a short description, as well as other features. This simulation uses the approximate location and date in the simulation environment. Events with no estimated fatalities were removed from the data under the assumption they are not indicative of a level of conflict sufficient to provoke new displacements. In the complete dataset there are 6,354 cases, 3,730 of which involve at least one fatality. Of these, 704 fit into the specified time period and were used in the simulation.  
+For each event, ACLED records the approximate location, date and time, estimated fatalities, a short description, as well as other features. This simulation uses the approximate location and date in the simulation environment. Events with no estimated fatalities were removed from the data under the assumption they are not indicative of a level of conflict sufficient to provoke new displacements. In the complete dataset there are 6,354 cases, 3,730 of which involve at least one fatality. Of these, 704 fit into the specified time period and were used in the simulation to "switch on" locations' conflict status in the appropriate round. 
 
 _Populated Locations in Iraq_
 
