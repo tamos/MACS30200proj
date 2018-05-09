@@ -84,7 +84,7 @@ def go(args):
 		num_tot = {}
 
 
-		for each_agent in range(0, 1000):
+		for each_agent in range(0, 100):
 			place = np.random.randint(0, len(lm_key))
 			e.addAgent(location=lm[lm_key[place]])
 
@@ -112,31 +112,32 @@ def go(args):
 
 	results_df = pd.DataFrame(res_list)
 	results_df.to_csv('results_of_sim.csv')
-	results_val = results_df.iloc[-1,:]
+	results_val = [int(i) for i in results_df.iloc[-1,:]]
 	results_denom = sum(results_val)
 	results_columns = list(results_df.columns)
 
 	truth_df = pd.read_csv('truth_vals.csv', skiprows =1, header = None)
-	truth_val = truth_df.iloc[-1, :]
+	truth_val = [int(i) for i in truth_df.iloc[-1, :]]
 	truth_denom = sum(truth_val)
-	truth_columns = list(truth_df.columns)
+	truth_columns = list(truth_df.iloc[0, :])
 
-	truth_dict = dict(zip(truth_columns, truth_val/truth_denom))
-	result_dict = dict(zip(results_columns, results_val/results_denom))
-
+	truth_dict = dict(zip(truth_columns, [i/truth_denom for i in truth_val]))
+	result_dict = dict(zip(results_columns, [i/results_denom for i in results_val]))
 	error_list = []
 	error_places = []
 
 	for result_key, result_item in result_dict.items():
+		#print(result_key, "AGSINST", truth_dict)
 		if result_key in truth_dict:
-		    error = abs(truth_dict[result_key] - result_item)
+			error = abs(truth_dict[result_key] - result_item)
+			print("for {}, error is {}".format(result_key, error))
+			error_list.append(error)
+			error_places.append(result_key)
 		else:
-			error = result_item
-		print("for {}, error is {}".format(result_key, error))
-		error_list.append(error)
-		error_places.append(result_key)
+			pass
+			#error = result_item
 	pd.DataFrame([error_places, error_list]).T.to_csv('errors_results.csv')
-	return sum(error_list)
+	return np.mean(error_list)
 
 
 
@@ -153,24 +154,27 @@ if __name__ == "__main__":
 
 	minimizer_kwargs = {"method": "BFGS"}
 
-	x0 = [2, 0.5, 300, 1000, 0.3, 0.4, 0.1]
+	x0 = [5, 0.2, 10, 10, 0.1, 0.1, 0.1]
 
-	ret = basinhopping(go, x0, 
-		minimizer_kwargs=minimizer_kwargs,
-		niter=10, disp = True)
+	#ret = basinhopping(go, x0, 
+		#minimizer_kwargs=minimizer_kwargs,
+		#niter=10)
 
-	#rranges = (slice(0,1,0.25), slice(0, 1, 0.25),
-		       #slice(10, 100, 5), slice(10, 1000, 100),
-		       #slice(0, 1.0, 0.5), slice(0, 1.0, 0.5),
-		       #slice(0, 1.0, 0.5))
-	#ret = brute(go, rranges, disp = True)#,
+	rranges = (slice(0,1,0.1), slice(0, 1, 0.1),
+		       slice(0, 100, 10), slice(0, 1000, 100),
+		       slice(0, 1.0, 0.1), slice(0, 1.0, 0.1),
+		       slice(0, 1.0, 0.1))
+	ret = brute(go, rranges, disp = True)#,
 					#finish = fmin)
 
 	#ret = go([2, 0.5, 300, 1000, 0.1, 0.4, 0.1])
 	print(ret)
-	#print("BEST PARAMS", ret[0])
-	#print("PROVIDE ERROR OF", go(ret[0]))
+	#go_vals = [ 4.26642083e+00, -7.02500877e-03,  1.01585004e+01,  1.05621909e+01, -9.07899883e-02, -2.07080421e-01, -6.62580836e-01]
+	#go_vals = [ 5.17107326, -0.39410599,  9.92363267, 10.17238293, -0.81284913,
+        #0.67581873,  0.37396598]
 
+	#print("BEST PARAMS", ret[0])
+	#print("PROVIDE ERROR OF", go(go_vals))
 
 	#print("global minimum: x = %.4f, f(x0) = %.4f" % (ret.x, ret.fun))
 
