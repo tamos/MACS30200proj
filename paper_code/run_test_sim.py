@@ -157,17 +157,17 @@ if __name__ == "__main__":
 
 	ret = basinhopping(go, x0, 
 		minimizer_kwargs=minimizer_kwargs,
-		niter=3, disp = True)
+		niter=10, disp = True)
 
 	#rranges = (slice(0,1,0.25), slice(0, 1, 0.25),
-	#	       slice(10, 100, 5), slice(10, 1000, 100),
-	#	       slice(0, 1.0, 0.5), slice(0, 1.0, 0.5),
-	#	       slice(0, 1.0, 0.5))
+		       #slice(10, 100, 5), slice(10, 1000, 100),
+		       #slice(0, 1.0, 0.5), slice(0, 1.0, 0.5),
+		       #slice(0, 1.0, 0.5))
 	#ret = brute(go, rranges, disp = True)#,
 					#finish = fmin)
 
 	#ret = go([2, 0.5, 300, 1000, 0.1, 0.4, 0.1])
-	#print(ret)
+	print(ret)
 	#print("BEST PARAMS", ret[0])
 	#print("PROVIDE ERROR OF", go(ret[0]))
 
