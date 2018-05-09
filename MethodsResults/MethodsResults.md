@@ -45,7 +45,7 @@ _The FLEE Agent-based Modelling Environment_
 
 FLEE is a purpose-built Agent-based Modelling (ABM) environment for simulating the flow of people. [@suleimenova2017generalized] The initial development of the environment has focused on modelling forced displacement, specifically refugee movements. In FLEE, agents traverse a network where each node represents a town, camp, or conflict. Agents follow a series of rules in order to determine where they will travel where conflict and distant locations are less likely to be selected, and non-conflict and proximate locations are more likely. 
 
-In this iteration of the simulation environment, each agent represents a household (family). At each step of the ecosystem, in this case a 2-week period, agents navigate the ecosystem according to a set of rules inspired by the gravity model of migration. A fixed number of agents (100) are added to locations at random once per step. Agents at those locations then decide to stay or move based on the population of their current location and the distance to other locations, as in the gravity model. In this simulation, there were seven possible parameters which could be adjusted (see below).
+In this iteration of the simulation environment, each agent represents a household (family). At each step of the ecosystem, in this case a 2-week period, agents navigate the ecosystem according to a set of rules inspired by the gravity model of migration. In short, under the gravity model the relative attractiveness of a location is a function of the population size of the destination location and the distance to that location. In this simulation, the population size is the number of internally displaced people, and the distance is the euclidean distance between points as calculated by the GeoPandas `distance` function. A fixed number of agents (100) are added to locations at random once per step. Agents at those locations then decide to stay or move based on the population of their current location and the distance to other locations, as in the gravity model. In this simulation, there were seven possible parameters which could be adjusted (see below).
 
 \newpage
 <center>
@@ -59,6 +59,17 @@ In this iteration of the simulation environment, each agent represents a househo
 |  `ConflictMoveChance` |  Default probability for leaving a conflict zone. |
 |  `CampMoveChance` |  Default probability for leaving a camp. |
 |  `DefaultMoveChance` |  Default probability for leaving any location. |
+</center>
+
+<center>
+#### Parameters and Constructs
+| Name | Construct (Gravity Analogy)  | 
+|---|---|
+| `CampWeight`  | The attractive power of camps (mass) |  
+| `ConflictWeight` | The repellent factor of conflicts (mass) |
+|  `ConflictMoveChance` | Agents' decision to leave a conflict. |
+|  `CampMoveChance` |  Agents' decision to leave a camp. |
+|  `DefaultMoveChance` |  Agents' decision to leave any given location|
 </center>
 
 Apart from these parameters, the simulation was set so that agents introduced added to existing populations (`TakeRefugeesFromPopulation = False`), camp weights were dynamically calculated based on the agent population in the camp at each step (`UseDynamicCampWeights = True`), agent awareness was limited to their location (`AwarenessLevel = 1`), IDP mode was enabled (`UseIDPMode = True`), and agents did not accumulate knowledge about the network over time (`UseDynamicAwareness = False`).
@@ -91,7 +102,7 @@ _Heuristic Optimization_
 
 As an alternative to algorithmic optimization, parameters were entered by hand, based upon simple heuristics (e.g., the chance of leaving a conflict zone is greater than the chance of leaving a non-conflict zone). These results are summarized below. What is notable from an initial review of these results is that the simulation does not appear to be very sensitive to parameters, error is consistently between 8 and 10%.
 
-
+\newpage
 #### Selected Heuristically-Defined Parameterizations
 
 _Case 1:_
@@ -108,7 +119,6 @@ Mean Error: 0.086
 |  `CampMoveChance` |  0.4 |
 |  `DefaultMoveChance` |  0.1 |
 
-\newpage
 _Case 2:_
 
 Mean Error: 0.089
@@ -138,7 +148,7 @@ Mean Error: 0.085
 |  `CampMoveChance` |  0.4 |
 |  `DefaultMoveChance` |  0.1 |
 
-
+\newpage
 _Case 4:_
 
 Mean Error: 0.086
