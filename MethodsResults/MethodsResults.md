@@ -1,25 +1,25 @@
 #### Data
 
-The principal data sources for this analysis are: (i) records of the volume and geographic distribution of internally displaced people collected by the International Organization for Migration (IOM); (ii) records of violent incidents from the Armed Conflict Location and Event Database (ACLED); (iii) spatial data for populated locations from the United Nations Office for the Coordination of Humanitarian Affairs (UNOCHA). ^[Links to download all data files are available in the Appendix.]
+The principal data sources for this analysis are: (i) records of the volume and geographic distribution of internally displaced people collected by the International Organization for Migration (IOM); (ii) records of violent incidents from the Armed Conflict Location and Event Database (ACLED), and; (iii) spatial data for populated locations from the United Nations Office for the Coordination of Humanitarian Affairs (UNOCHA). ^[Links to download all data files are available in the Appendix.]
 
 _IOM Displacement Tracking Matrix (DTM)_
 
-IOM conducts regular surveys of the location and number of displaced households in Iraq. Surveys are conducted approximately every two weeks as part of IOM's assessment system. ^[See @iommethods for details of the survey methodology.] For this simulation, the IDP Master Lists for rounds 84 (November 29, 2017) through 91 (April 30, 2018) were used. 
+IOM conducts regular surveys of the location and number of displaced households in Iraq. Surveys are conducted approximately every two weeks as part of IOM's assessment system. ^[See @iommethods for details of the survey methodology.] For this simulation, the IDP Master Lists for rounds 84 (November 29, 2017) through 91 (April 30, 2018) were used. On average, each round of the survey has 2,436 cases.
 
 IDP Master Lists have consistent formats across rounds, which motivated their selection over more granular round-specific reports. Each Master List provides updated figures of the number of households at each reported location, as well as adding new locations as they are surveyed. Master Lists were downloaded as MS Excel documents and converted to CSV format.
 
 _Armed Conflict Location and Event Database (ACLED)_
 
-ACLED is an initiative which catalogues incidents of violence across a number of countries. ACLED data are frequently used by researchers studying conflict/crisis. For this simulation, ACLED data for Iraq was accessed from the Humanitarian Data Exchange portal's live update link as a CSV. [@humdata]
+ACLED is an initiative which catalogues incidents of violence across a number of countries. ACLED data are frequently used by researchers studying conflict/crisis. For this simulation, ACLED data for Iraq was accessed from the Humanitarian Data Exchange portal's live update link as a CSV. [@humdata] 
 
-For each event, ACLED records the approximate location, date and time, estimated fatalities, a short description, as well as other features. This simulation uses the approximate location and the time in the simulation environment. Events with no estimated fatalities were removed from the data under the assumption they are not indicative of a level of conflict sufficient to provoke new displacements. 
+For each event, ACLED records the approximate location, date and time, estimated fatalities, a short description, as well as other features. This simulation uses the approximate location and the time in the simulation environment. Events with no estimated fatalities were removed from the data under the assumption they are not indicative of a level of conflict sufficient to provoke new displacements. In the complete dataset there are 6,354 cases, 3,730 of which involve at least one fatality. Of thse, 704 fit into the specified time period and were used in the simulation.  
 
 _Populated Locations in Iraq_
 
-Spatial data on the location of populated places in Iraq was collected from UNOCHA, via the HumData portal in ShapeFile format. [@unochaspatial] This dataset was chosen specifically as it is compatible with the Displacement Tracking Matrix and is derived from IOM's internal placename database. It provides the names and locations of not only official settlements, but neighbourhoods and other unofficial locations. 
+Spatial data on the location of 23,991 populated places in Iraq was collected from UNOCHA, via the HumData portal in ShapeFile format. [@unochaspatial] This dataset was chosen specifically as it is compatible with the Displacement Tracking Matrix and is derived from IOM's internal placename database. It provides the names and locations of not only official settlements, but neighbourhoods and other unofficial locations, allowing for regional centroids to be weighted by density of settlements, not area.
 
 <center>
-| Source | Variable |  Start |  End | 
+| Source | Usage |  Start |  End | 
 |---|---|---|---|---|
 | IOM | IDP Location |  2017-11-29 | 2018-04-30 |
 | IOM | IDP Population |  2017-22-29 | 2018-04-30 |
@@ -29,29 +29,21 @@ Spatial data on the location of populated places in Iraq was collected from UNOC
 
 _Data Joining and Aggregation_ ^[Algorithms used to perform these operations are available in the Appendix.]
 
-To align the three data sources in the desired format, a series of aggregation and spatial join operations were performed. The spatial geometries of IDP, event, and populated places were transformed into representative polygons using the GeoPandas convex hull functionality after being aggregated to the level of the first sub-national administrative region (governorate/province). On these transformed datasets, two sets of spatial joins were used. First, the populated locations were joined with the observed IDP populations data. Population numbers were summed by region to establish the initial and future populations of each location. Second, the populated locations, aggregated to the regional level and represented geometrically as a convex hull, were joined with ACLED records involving at least one fatality. Population location geometries were then transformed into centroids for use as node locations. Lastly, the distance between these centroids was calculated using the GeoPandas `distance` function.
+To align the three data sources in the desired format, a series of aggregation and spatial join operations were performed. The spatial geometries of IDP, event, and populated places were transformed into representative polygons using the GeoPandas convex hull functionality after being aggregated to the level of one of Iraq's 18 first-level sub-national administrative regions (governorate/province). On these transformed datasets, two sets of spatial joins were used. First, the populated locations were joined with the observed IDP populations data. Population numbers were summed by region to establish the initial and future populations of each location. Second, the populated locations, aggregated to the regional level and represented geometrically as a convex hull, were joined with ACLED records involving at least one fatality. Population location geometries were then transformed into centroids for use as node locations. Lastly, the distance between these centroids was calculated using the GeoPandas `distance` function.
 
-These joins and aggregation produced four datasets:
-	- population centres represented as a point, with starting IDP populations (nodes)
-	- final observed IDP populations by population centre
-	- conflict locations and their date of observation
-	- distance between all population centres (edges)
+These joins and aggregation produced four datasets: (i) population centres represented as a point, with starting IDP populations (nodes); (ii) final observed IDP populations by population centre; (iii) conflict locations and their date of observation, and; (iv) distance between all population centres (edges).
 
+_Missingness_
+
+The validation period used in this iteration of the simulation uses observed values from round 91 (late April) to calculate error rates. Round 91 of the Displacement Tracking Matrix does not contain IDP totals for all governorates. The error rate used is calculated based on those governorates for which there are observed values. In future iterations, alternative error calculations will be explored.
 
 #### Models and Methods
 
-- Household vs individual
-why household?
-
-_Agent-based Models_
-
-Agent-based simulations require the modeller to specify all rules by which individuals make decisions. This makes explicit the connection between results and theory. In a displacement simulation, agents (a household or individual) move across a virtual space and interact with elements of the simulation according to some set of rules. ^[See @edwardschaos for an accessible explanation of agent-based models.] Beyond its proven ability to model a wide range of phenomena, this approach is intuitively understood by non-technical audiences and is relatively simple to implement. 
-
-Many of the critiques of simulation generally, such as those from Maldonado and Greenland [-@maldonadosimulationcritical] apply to agent-based models in particular. The rules by which agents "live" may be unreasonable simplifications or require bold assumptions which, in the worst case, limit simulation results' generalizability to just other simulations. This is notable given one of the reasons for choosing simulation methods is to manipulate virtual ecosystems that enhance understanding of reality.
-
 _The FLEE Agent-based Modelling Environment_
 
-FLEE is a purpose-built Agent-based Modelling (ABM) environment for simulating the flow of people. The initial development of the environment has focused on modelling forced displacement, specifically refugee movements. In FLEE, agents traverse a network where each node represents a town, camp, or conflict. Agents follow a series of rules in order to determine where they will travel where conflict and distant locations are less likely to be selected, and non-conflict and proximate locations are more likely. In this simulation, there were seven possible parameters which could be adjusted.
+FLEE is a purpose-built Agent-based Modelling (ABM) environment for simulating the flow of people. [@suleimenova2017generalized] The initial development of the environment has focused on modelling forced displacement, specifically refugee movements. In FLEE, agents traverse a network where each node represents a town, camp, or conflict. Agents follow a series of rules in order to determine where they will travel where conflict and distant locations are less likely to be selected, and non-conflict and proximate locations are more likely. 
+
+In this iteration of the simulation environment, each agent represents a household (family). At each step of the ecosystem, in this case a 2-week period, agents navigate the ecosystem according to a set of rules inspired by the gravity model of migration. A fixed number of agents (100) are added to locations at random once per step. Agents at those locations then decide to stay or move based on the population of their current location and the distance to other locations, as in the gravity model. In this simulation, there were seven possible parameters which could be adjusted (see below).
 
 <center>
 #### Parameters Varied In the Simulation
@@ -68,21 +60,19 @@ FLEE is a purpose-built Agent-based Modelling (ABM) environment for simulating t
 
 Apart from these parameters, the simulation was set so that agents introduced added to existing populations (`TakeRefugeesFromPopulation = False`), camp weights were dynamically calculated based on the agent population in the camp at each step (`UseDynamicCampWeights = True`), agent awareness was limited to their location (`AwarenessLevel = 1`), IDP mode was enabled (`UseIDPMode = True`), and agents did not accumulate knowledge about the network over time (`UseDynamicAwareness = False`).
 
-_framework structure, algorithm_
-
-
-_Random Walks_
-
-The movement of displaced people can be thought of as a random walk, where displaced people move between points according to some set of probabilities defined by a specified function. ^[One well-known example is Lévy flight.] This approach is used to model the movement of animal populations in biology and everyday human movement. [@codlingrandomwalks; @bovet1988spatial; @gallotti2016stochastic] It may have some application in the study of forced migration - a random walk simulation from the International Organziation for Migration reportedly predicts displacement trends with error rates less than 10%. [@iomrandomwalk] ^[This claim is yet to be tested in a peer-reviewed publication.]
-
-For their apparent robustness, random walks have questionable theoretical value for research in forced migration. If a process of forced migration is in fact a random walk, how does one interpret the results of a given simulation? What do simulation results say about the experience of displaced people? To the author's knowledge, there is no systematic way to interpret random walks to answer such questions. Nevertheless, random walks' ability to "blindly" model real phenomena makes them useful as a benchmark against which to compare more sophisticated models - a "uniform probability plus" of sorts. If a random walk outperforms more theoretically-informed models, this should be interpreted as weakness in the sophisticated model, rather than support of any "chaos" theory of forced migration. 
-
-
-_simulation set up and iteration_
-
-_optimization attempts_
+The ecosystem was initialized with locations drawn from the processed list of locations (i) above. The distances between nodes were used to create links between locations (iv). Throughout the simulation, if a location was included in the list of conflict locations for that step, the location was changed to a 'conflict' zone, and the weights agents use to implement their decision function were re-calculated. To evaluate the apropriateness of the simulation parameters, an error function is calculated from the proportion of displaced people in each governorate predicted by the simulation and the true observed proportions of IDPs in each governorate.
 
 #### Results
+
+_Algorithmic Optimization_
+
+The simulation parameters were optimized using two different algorithms commonly applied to discrete simulations. These algorithms were chosen for their ability to produce a global optimum. Both algorithms were implemented through the `scipy.optimize` library. The objective function used was a mean error calculated from the comparing the governorate-level distribution of agents and observed IDPs in the final step of the simulation (round 91 of the IOM DTM).
+
+The first algorithm, the basin hopper algorithm,^[See https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.basinhopping.html ] produced a mean error of 0.09, 0.10 and  for 3, 5, and 10 iterations, respectively. ^[See Appendix for details of both algorithms' results.] The second algorithm, brute force, was not able to converge in a computationally tractable time period. Future iterations of this simulation will explore  parallel processing as a possible solution to this issue. This point will be expanded upon in the next section. 
+
+#### Further Steps
+
+In the next iteration of this simulation, additional optimization algorithms will be employed and compared to simple heuristic parameterizations. In order to implement certain algorithms, such as brute force, tools such as multi-thread and parallel processing will be explored. Different and more granular validation measures will be employed to better understand the robustness of the simulation to new test data. In the next week, new data will be available from ACLED and IOM which will help to futher test the performance of the simulation. 
 
 
 \pagebreak
@@ -155,21 +145,63 @@ _Creation of test dataset_
 	write to file
 
 
+
+
 \newpage
 #### Figures
 
 ![Iraq Populated Places with level 1 administrative boundaries. Source: UNOCHA ](PopulatedLocations.png)
 
 
+\newpage
+
+#### Basin Hopper Optimized Parameters
+
+Starting parameter vector of: 5, 0.2, 10, 10, 0.1, 0.1, 0.1
+
+_Iterations: 3_
+
+Mean Error: 0.0967734444771941
+
+Optimized Parameters: 4.26642083e+00, -7.02500877e-03,  1.01585004e+01,  1.05621909e+01, -9.07899883e-02, -2.07080421e-01, -6.62580836e-01
+
+
+
+_Iterations: 5_
+
+Mean Error: 0.10395007399424917
+
+Optimized Parameters: 5.3530009, 0.65435315, 9.71979426, 9.41641239, 1.93755486, -0.19553126, 0.69430158
+
+
+
+_Iterations: 10_
+
+Mean Error: 0.10150157686490097
+
+Optimized Parameters: 5.17107326, -0.39410599,  9.92363267, 10.17238293, -0.81284913, 0.67581873,  0.37396598
+
+
+#### Brute Force Optimized Parameters
+
+
+Mean Error: Not Obtained
+
+Optimized Parameters:  Not Obtained
+
+Permutations of parameter values were defined in a space of:
+(0,1,0.1) x (0, 1, 0.1) x (0, 100, 10) x (0, 1000, 100) x (0, 1.0, 0.1) x (0, 1.0, 0.1) x (0, 1.0, 0.1)
+
+Where each tuple represents: (lower bound, upper bound, step value).
 
 \pagebreak
 # References
 
 ---
-title: "Simulating Forced Migration with the Flee Agent-based Modelling Environment "
+title: "Simulating Forced Migration with the Flee Agent-based Modelling Environment: Preliminary Results"
 author: Tyler Amos
 date: 9 May 2018
-abstract: "This is a summary of initial results for a simulation of forced migration, specifically internal displacement. Iraq in the period January 2017 through to April 2018 is used as a case study. "
+abstract: "This is a summary of initial results for a simulation of forced migration, specifically internal displacement. The case study used is Iraq in the period January 2017 through to April 2018. "
 
 bibliography: Simulating-Displacement-MethodsResults.bib
     
