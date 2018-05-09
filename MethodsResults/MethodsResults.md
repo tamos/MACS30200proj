@@ -159,7 +159,7 @@ _Creation of test dataset_
 
 Starting parameter vector of: 5, 0.2, 10, 10, 0.1, 0.1, 0.1
 
-_Iterations: 3_
+__Iterations: 3__
 
 Mean Error: 0.0967734444771941
 
@@ -167,7 +167,7 @@ Optimized Parameters: 4.26642083e+00, -7.02500877e-03,  1.01585004e+01,  1.05621
 
 
 
-_Iterations: 5_
+__Iterations: 5__
 
 Mean Error: 0.10395007399424917
 
@@ -175,7 +175,7 @@ Optimized Parameters: 5.3530009, 0.65435315, 9.71979426, 9.41641239, 1.93755486,
 
 
 
-_Iterations: 10_
+__Iterations: 10__
 
 Mean Error: 0.10150157686490097
 
