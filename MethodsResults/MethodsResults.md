@@ -1,4 +1,4 @@
-Can we use agent-based simulation to accurately predict the volume and geographic distribution of internal displacement? This paper uses the FLEE agent-based modelling environment to study internal displacement in Iraq from January 2017 through to April 2018. This section describes the data sources and cleaning algorithms, the FLEE environment and the basic ruleset for agents, and initial results of parameter optimization. 
+Can agent-based simulation accurately predict the volume and geographic distribution of internal displacement? This paper uses the FLEE agent-based modelling environment to study internal displacement in Iraq from January 2017 through to April 2018. This section describes the data sources and cleaning algorithms, the FLEE environment and the basic ruleset for agents, and initial results of parameter optimization. 
 
 #### Data
 
@@ -14,7 +14,7 @@ _Armed Conflict Location and Event Database (ACLED)_
 
 ACLED is an initiative which catalogues incidents of violence across a number of countries. ACLED data are frequently used by researchers studying conflict/crisis. For this simulation, ACLED data for Iraq were accessed from the Humanitarian Data Exchange portal's live update link as a CSV. [@humdata] 
 
-For each event, ACLED records the approximate location, date and time, estimated fatalities, a short description, as well as other features. This simulation uses the approximate location and the time in the simulation environment. Events with no estimated fatalities were removed from the data under the assumption they are not indicative of a level of conflict sufficient to provoke new displacements. In the complete dataset there are 6,354 cases, 3,730 of which involve at least one fatality. Of these, 704 fit into the specified time period and were used in the simulation.  
+For each event, ACLED records the approximate location, date and time, estimated fatalities, a short description, as well as other features. This simulation uses the approximate location and date in the simulation environment. Events with no estimated fatalities were removed from the data under the assumption they are not indicative of a level of conflict sufficient to provoke new displacements. In the complete dataset there are 6,354 cases, 3,730 of which involve at least one fatality. Of these, 704 fit into the specified time period and were used in the simulation to "switch on" locations' conflict status in the appropriate round. 
 
 _Populated Locations in Iraq_
 
@@ -45,7 +45,7 @@ _The FLEE Agent-based Modelling Environment_
 
 FLEE is a purpose-built Agent-based Modelling (ABM) environment for simulating the flow of people. [@suleimenova2017generalized] The initial development of the environment has focused on modelling forced displacement, specifically refugee movements. In FLEE, agents traverse a network where each node represents a town, camp, or conflict. Agents follow a series of rules in order to determine where they will travel where conflict and distant locations are less likely to be selected, and non-conflict and proximate locations are more likely. 
 
-In this iteration of the simulation environment, each agent represents a household (family). At each step of the ecosystem, in this case a 2-week period, agents navigate the ecosystem according to a set of rules inspired by the gravity model of migration. A fixed number of agents (100) are added to locations at random once per step. Agents at those locations then decide to stay or move based on the population of their current location and the distance to other locations, as in the gravity model. In this simulation, there were seven possible parameters which could be adjusted (see below).
+In this iteration of the simulation environment, each agent represents a household (family). At each step of the ecosystem, in this case a 2-week period, agents navigate the ecosystem according to a set of rules inspired by the gravity model of migration. In short, under the gravity model the relative attractiveness of a location is a function of the population size of the destination location and the distance to that location. In this simulation, the population size is the number of internally displaced people, and the distance is the euclidean distance between points as calculated by the GeoPandas `distance` function. A fixed number of agents (100) are added to locations at random once per step. Agents at those locations then decide to stay or move based on the population of their current location and the distance to other locations, as in the gravity model. In this simulation, there were seven possible parameters which could be adjusted (see below).
 
 \newpage
 <center>
@@ -61,6 +61,17 @@ In this iteration of the simulation environment, each agent represents a househo
 |  `DefaultMoveChance` |  Default probability for leaving any location. |
 </center>
 
+<center>
+#### Parameters and Constructs
+| Name | Construct (Gravity Analogy)  | 
+|---|---|
+| `CampWeight`  | The attractive power of camps (mass) |  
+| `ConflictWeight` | The repellent factor of conflicts (mass) |
+|  `ConflictMoveChance` | Agents' decision to leave a conflict. |
+|  `CampMoveChance` |  Agents' decision to leave a camp. |
+|  `DefaultMoveChance` |  Agents' decision to leave any given location|
+</center>
+
 Apart from these parameters, the simulation was set so that agents introduced added to existing populations (`TakeRefugeesFromPopulation = False`), camp weights were dynamically calculated based on the agent population in the camp at each step (`UseDynamicCampWeights = True`), agent awareness was limited to their location (`AwarenessLevel = 1`), IDP mode was enabled (`UseIDPMode = True`), and agents did not accumulate knowledge about the network over time (`UseDynamicAwareness = False`).
 
 The ecosystem was initialized with locations drawn from the processed list of locations (i) above. The distances between nodes were used to create links between locations (iv). Throughout the simulation, if a location was included in the list of conflict locations for that step, the location was changed to a 'conflict' zone, and the weights agents use to implement their decision function were re-calculated. To evaluate the appropriateness of the simulation parameters, an error function was calculated from the difference in proportions of displaced people in each governorate predicted by the simulation and the true observed proportions of IDPs in each governorate.
@@ -73,7 +84,10 @@ Algorithmic optimization of the simulation parameters was done using two differe
 
 The first algorithm, the basin hopper algorithm,^[See https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.basinhopping.html ] produced a mean error of 0.09, 0.10 and 0.10 for 3, 5, and 10 iterations, respectively. The optimized parameters, however, include values which are not meaningful, such as negative probabilities. ^[See Appendix for details of both algorithms' results.] The second algorithm, brute force, was not able to converge in a computationally tractable time period. Future iterations of this simulation will explore  parallel processing as a possible solution to this issue, as brute force algorithms will allow greater control over the permitted simulation parameters, thus avoiding the issue of optimizations producing invalid parameters. The potential use of parallelization will be expanded upon in the next section. 
 
-#### Algorithmically-Optimized Parameters
+#### Selected Optimization Results (3 Iterations)
+
+Mean Error: 0.096
+
 | Name | Optimized Value | 
 |---|---|
 | `CampWeight`  | 4.266 |  
@@ -86,9 +100,9 @@ The first algorithm, the basin hopper algorithm,^[See https://docs.scipy.org/doc
 
 _Heuristic Optimization_
 
-As an alternative to algorithmic optimization, parameters were entered by hand, based upon simple heuristics (e.g., the chance of leaving a conflict zone is greater than the chance of leaving a non-conflict zone). These results are summarized below. What is notable from an initial review of these results is that the simulation does not appear to be very sensitive to parameters. 
+As an alternative to algorithmic optimization, parameters were entered by hand, based upon simple heuristics (e.g., the chance of leaving a conflict zone is greater than the chance of leaving a non-conflict zone). These results are summarized below. What is notable from an initial review of these results is that the simulation does not appear to be very sensitive to parameters, error is consistently between 8 and 10%.
 
-
+\newpage
 #### Selected Heuristically-Defined Parameterizations
 
 _Case 1:_
@@ -105,7 +119,6 @@ Mean Error: 0.086
 |  `CampMoveChance` |  0.4 |
 |  `DefaultMoveChance` |  0.1 |
 
-\newpage
 _Case 2:_
 
 Mean Error: 0.089
@@ -135,7 +148,7 @@ Mean Error: 0.085
 |  `CampMoveChance` |  0.4 |
 |  `DefaultMoveChance` |  0.1 |
 
-
+\newpage
 _Case 4:_
 
 Mean Error: 0.086
@@ -153,7 +166,7 @@ Mean Error: 0.086
 
 #### Further Steps
 
-In the next iteration of this simulation, additional optimization algorithms will be employed and compared to simple heuristic parameterizations. In order to implement certain algorithms, such as brute force, tools such as multi-thread and parallel processing will be explored. Different and more granular validation measures will be employed to better understand the robustness of the simulation to new test data. In the next week, new data will be available from ACLED and IOM which will help to futher test the performance of the simulation. 
+In the next iteration of this simulation, additional optimization algorithms will be employed and compared to heuristic parameterizations (as above). In order to implement certain algorithms, such as brute force, tools such as multi-thread and parallel processing will be explored. Different and more granular validation measures will be employed to better understand the robustness of the simulation to new test data. In the next week, new data will be available from ACLED and IOM which will help to futher test the performance of the simulation. 
 
 
 \pagebreak
@@ -226,6 +239,9 @@ _Creation of test dataset_
 	write to file
 
 
+_Links to Code_
+
+Code used to produce the simulation environment, clean, and represent data are available at: https://github.com/tamos/MACS30200proj.
 
 
 \newpage
@@ -282,7 +298,7 @@ Where each tuple represents: (lower bound, upper bound, step value).
 title: "Simulating Forced Migration with the FLEE Agent-based Modelling Environment: Preliminary Results"
 author: Tyler Amos
 date: 9 May 2018
-abstract: "This is a summary of initial results for a simulation of forced migration, specifically internal displacement. The case study used is Iraq in the period January 2017 through to April 2018. "
+abstract: "This is a summary of initial results for an agent-based simulation of forced migration, specifically internal displacement, with the FLEE simulation environment. The case study used is Iraq in the period January 2017 through to April 2018. "
 
 bibliography: Simulating-Displacement-MethodsResults.bib
     
