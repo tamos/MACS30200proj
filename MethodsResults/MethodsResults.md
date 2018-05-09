@@ -1,3 +1,5 @@
+Can we use agent-based simulation to accurately predict the volume and geographic distribution of internal displacement? This paper uses the FLEE agent-based modelling environment to study internal displacement in Iraq from January 2017 through to April 2018. This section describes the data sources and cleaning algorithms, the FLEE environment and the basic ruleset for agents, and initial results of parameter optimization. 
+
 #### Data
 
 The principal data sources for this analysis are: (i) records of the volume and geographic distribution of internally displaced people collected by the International Organization for Migration (IOM); (ii) records of violent incidents from the Armed Conflict Location and Event Database (ACLED), and; (iii) spatial data for populated locations from the United Nations Office for the Coordination of Humanitarian Affairs (UNOCHA). ^[Links to download all data files are available in the Appendix.]
@@ -10,13 +12,13 @@ IDP Master Lists have consistent formats across rounds, which motivated their se
 
 _Armed Conflict Location and Event Database (ACLED)_
 
-ACLED is an initiative which catalogues incidents of violence across a number of countries. ACLED data are frequently used by researchers studying conflict/crisis. For this simulation, ACLED data for Iraq was accessed from the Humanitarian Data Exchange portal's live update link as a CSV. [@humdata] 
+ACLED is an initiative which catalogues incidents of violence across a number of countries. ACLED data are frequently used by researchers studying conflict/crisis. For this simulation, ACLED data for Iraq were accessed from the Humanitarian Data Exchange portal's live update link as a CSV. [@humdata] 
 
-For each event, ACLED records the approximate location, date and time, estimated fatalities, a short description, as well as other features. This simulation uses the approximate location and the time in the simulation environment. Events with no estimated fatalities were removed from the data under the assumption they are not indicative of a level of conflict sufficient to provoke new displacements. In the complete dataset there are 6,354 cases, 3,730 of which involve at least one fatality. Of thse, 704 fit into the specified time period and were used in the simulation.  
+For each event, ACLED records the approximate location, date and time, estimated fatalities, a short description, as well as other features. This simulation uses the approximate location and the time in the simulation environment. Events with no estimated fatalities were removed from the data under the assumption they are not indicative of a level of conflict sufficient to provoke new displacements. In the complete dataset there are 6,354 cases, 3,730 of which involve at least one fatality. Of these, 704 fit into the specified time period and were used in the simulation.  
 
 _Populated Locations in Iraq_
 
-Spatial data on the location of 23,991 populated places in Iraq was collected from UNOCHA, via the HumData portal in ShapeFile format. [@unochaspatial] This dataset was chosen specifically as it is compatible with the Displacement Tracking Matrix and is derived from IOM's internal placename database. It provides the names and locations of not only official settlements, but neighbourhoods and other unofficial locations, allowing for regional centroids to be weighted by density of settlements, not area.
+Spatial data on the location of 23,991 populated places in Iraq was collected from UNOCHA via the HumData portal in ShapeFile format. [@unochaspatial] This dataset was chosen specifically as it is compatible with the Displacement Tracking Matrix and is derived from IOM's internal placename database. It provides the names and locations of not only official settlements, but neighbourhoods and other unofficial locations, allowing for regional centroids to be weighted by density of settlements, not area.
 
 <center>
 | Source | Usage |  Start |  End | 
@@ -35,7 +37,7 @@ These joins and aggregation produced four datasets: (i) population centres repre
 
 _Missingness_
 
-The validation period used in this iteration of the simulation uses observed values from round 91 (late April) to calculate error rates. Round 91 of the Displacement Tracking Matrix does not contain IDP totals for all governorates. The error rate used is calculated based on those governorates for which there are observed values. In future iterations, alternative error calculations will be explored.
+The validation period used in this iteration of the simulation uses observed values from round 91 (late April 2018) to calculate error rates. Round 91 of the Displacement Tracking Matrix does not contain IDP totals for all governorates. The error rate used is calculated based on those governorates for which there are observed values. In future iterations, alternative error calculations will be explored.
 
 #### Models and Methods
 
@@ -45,10 +47,11 @@ FLEE is a purpose-built Agent-based Modelling (ABM) environment for simulating t
 
 In this iteration of the simulation environment, each agent represents a household (family). At each step of the ecosystem, in this case a 2-week period, agents navigate the ecosystem according to a set of rules inspired by the gravity model of migration. A fixed number of agents (100) are added to locations at random once per step. Agents at those locations then decide to stay or move based on the population of their current location and the distance to other locations, as in the gravity model. In this simulation, there were seven possible parameters which could be adjusted (see below).
 
+\newpage
 <center>
 #### Parameters Varied In the Simulation
 | Name | Description  | 
-|---|---|---|---|---|
+|---|---|
 | `CampWeight`  | The factor by which camps 'attract' agents. |  
 | `ConflictWeight` | Reduction factor for camps. |
 |  `MinMoveSpeed` | Minimum distance an agent covers in one step. | 
@@ -60,15 +63,93 @@ In this iteration of the simulation environment, each agent represents a househo
 
 Apart from these parameters, the simulation was set so that agents introduced added to existing populations (`TakeRefugeesFromPopulation = False`), camp weights were dynamically calculated based on the agent population in the camp at each step (`UseDynamicCampWeights = True`), agent awareness was limited to their location (`AwarenessLevel = 1`), IDP mode was enabled (`UseIDPMode = True`), and agents did not accumulate knowledge about the network over time (`UseDynamicAwareness = False`).
 
-The ecosystem was initialized with locations drawn from the processed list of locations (i) above. The distances between nodes were used to create links between locations (iv). Throughout the simulation, if a location was included in the list of conflict locations for that step, the location was changed to a 'conflict' zone, and the weights agents use to implement their decision function were re-calculated. To evaluate the apropriateness of the simulation parameters, an error function is calculated from the proportion of displaced people in each governorate predicted by the simulation and the true observed proportions of IDPs in each governorate.
+The ecosystem was initialized with locations drawn from the processed list of locations (i) above. The distances between nodes were used to create links between locations (iv). Throughout the simulation, if a location was included in the list of conflict locations for that step, the location was changed to a 'conflict' zone, and the weights agents use to implement their decision function were re-calculated. To evaluate the appropriateness of the simulation parameters, an error function was calculated from the difference in proportions of displaced people in each governorate predicted by the simulation and the true observed proportions of IDPs in each governorate.
 
 #### Results
 
 _Algorithmic Optimization_
 
-The simulation parameters were optimized using two different algorithms commonly applied to discrete simulations. These algorithms were chosen for their ability to produce a global optimum. Both algorithms were implemented through the `scipy.optimize` library. The objective function used was a mean error calculated from the comparing the governorate-level distribution of agents and observed IDPs in the final step of the simulation (round 91 of the IOM DTM).
+Algorithmic optimization of the simulation parameters was done using two different algorithms commonly applied to discrete simulations. These algorithms were chosen for their ability to produce a global optimum. Both algorithms were implemented through the `scipy.optimize` library. The objective function used was a mean error calculated from comparing the governorate-level distribution of agents and observed IDPs in the final step of the simulation (round 91 of the IOM DTM).
 
-The first algorithm, the basin hopper algorithm,^[See https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.basinhopping.html ] produced a mean error of 0.09, 0.10 and  for 3, 5, and 10 iterations, respectively. ^[See Appendix for details of both algorithms' results.] The second algorithm, brute force, was not able to converge in a computationally tractable time period. Future iterations of this simulation will explore  parallel processing as a possible solution to this issue. This point will be expanded upon in the next section. 
+The first algorithm, the basin hopper algorithm,^[See https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.basinhopping.html ] produced a mean error of 0.09, 0.10 and 0.10 for 3, 5, and 10 iterations, respectively. The optimized parameters, however, include values which are not meaningful, such as negative probabilities. ^[See Appendix for details of both algorithms' results.] The second algorithm, brute force, was not able to converge in a computationally tractable time period. Future iterations of this simulation will explore  parallel processing as a possible solution to this issue, as brute force algorithms will allow greater control over the permitted simulation parameters, thus avoiding the issue of optimizations producing invalid parameters. The potential use of parallelization will be expanded upon in the next section. 
+
+#### Algorithmically-Optimized Parameters
+| Name | Optimized Value | 
+|---|---|
+| `CampWeight`  | 4.266 |  
+| `ConflictWeight` |-0.007 |
+|  `MinMoveSpeed` | 10.158 | 
+|  `MaxMoveSpeed` |  10.562 |
+|  `ConflictMoveChance` |  -0.090 |
+|  `CampMoveChance` |  -0.207|
+|  `DefaultMoveChance` |  -0.662 |
+
+_Heuristic Optimization_
+
+As an alternative to algorithmic optimization, parameters were entered by hand, based upon simple heuristics (e.g., the chance of leaving a conflict zone is greater than the chance of leaving a non-conflict zone). These results are summarized below. What is notable from an initial review of these results is that the simulation does not appear to be very sensitive to parameters. 
+
+
+#### Selected Heuristically-Defined Parameterizations
+
+_Case 1:_
+
+Mean Error: 0.086 
+
+| Name | Value | 
+|---|---|
+| `CampWeight`  | 100 |  
+| `ConflictWeight` |0.5 |
+|  `MinMoveSpeed` | 300 | 
+|  `MaxMoveSpeed` |  1000 |
+|  `ConflictMoveChance` |  0.1|
+|  `CampMoveChance` |  0.4 |
+|  `DefaultMoveChance` |  0.1 |
+
+\newpage
+_Case 2:_
+
+Mean Error: 0.089
+
+| Name | Value | 
+|---|---|
+| `CampWeight`  | 2 |  
+| `ConflictWeight` |0.5 |
+|  `MinMoveSpeed` | 100 | 
+|  `MaxMoveSpeed` |  1000 |
+|  `ConflictMoveChance` |  0.1|
+|  `CampMoveChance` |  0.9 |
+|  `DefaultMoveChance` |  0.8 |
+
+
+_Case 3:_
+
+Mean Error: 0.085
+
+| Name | Value | 
+|---|---|
+| `CampWeight`  | 100 |  
+| `ConflictWeight` |0.1 |
+|  `MinMoveSpeed` | 100 | 
+|  `MaxMoveSpeed` |  1000 |
+|  `ConflictMoveChance` |  0.8|
+|  `CampMoveChance` |  0.4 |
+|  `DefaultMoveChance` |  0.1 |
+
+
+_Case 4:_
+
+Mean Error: 0.086
+
+| Name | Value | 
+|---|---|
+| `CampWeight`  | 1|  
+| `ConflictWeight` |0.5 |
+|  `MinMoveSpeed` | 1 | 
+|  `MaxMoveSpeed` |  1000 |
+|  `ConflictMoveChance` |  0.1|
+|  `CampMoveChance` |  0.9 |
+|  `DefaultMoveChance` |  0.8 |
+
 
 #### Further Steps
 
@@ -159,15 +240,15 @@ _Creation of test dataset_
 
 Starting parameter vector of: 5, 0.2, 10, 10, 0.1, 0.1, 0.1
 
-_Iterations: 3_
+__Iterations: 3__
 
 Mean Error: 0.0967734444771941
 
-Optimized Parameters: 4.26642083e+00, -7.02500877e-03,  1.01585004e+01,  1.05621909e+01, -9.07899883e-02, -2.07080421e-01, -6.62580836e-01
+Optimized Parameters: 4.266, -0.00702500877, 10.1585,  10.562191, -0.0907899883, -0.207080421, -0.662580836
 
 
 
-_Iterations: 5_
+__Iterations: 5__
 
 Mean Error: 0.10395007399424917
 
@@ -175,7 +256,7 @@ Optimized Parameters: 5.3530009, 0.65435315, 9.71979426, 9.41641239, 1.93755486,
 
 
 
-_Iterations: 10_
+__Iterations: 10__
 
 Mean Error: 0.10150157686490097
 
@@ -198,7 +279,7 @@ Where each tuple represents: (lower bound, upper bound, step value).
 # References
 
 ---
-title: "Simulating Forced Migration with the Flee Agent-based Modelling Environment: Preliminary Results"
+title: "Simulating Forced Migration with the FLEE Agent-based Modelling Environment: Preliminary Results"
 author: Tyler Amos
 date: 9 May 2018
 abstract: "This is a summary of initial results for a simulation of forced migration, specifically internal displacement. The case study used is Iraq in the period January 2017 through to April 2018. "
