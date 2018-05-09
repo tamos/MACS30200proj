@@ -1,4 +1,4 @@
-Can we use agent-based simulation to accurately predict the volume and geographic distribution of internal displacement? This paper uses the FLEE agent-based modelling environment to study internal displacement in Iraq from January 2017 through to April 2018. This section describes the data sources and cleaning algorithms, the FLEE environment and the basic ruleset for agents, and initial results of parameter optimization. 
+Can agent-based simulation accurately predict the volume and geographic distribution of internal displacement? This paper uses the FLEE agent-based modelling environment to study internal displacement in Iraq from January 2017 through to April 2018. This section describes the data sources and cleaning algorithms, the FLEE environment and the basic ruleset for agents, and initial results of parameter optimization. 
 
 #### Data
 
@@ -73,7 +73,10 @@ Algorithmic optimization of the simulation parameters was done using two differe
 
 The first algorithm, the basin hopper algorithm,^[See https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.basinhopping.html ] produced a mean error of 0.09, 0.10 and 0.10 for 3, 5, and 10 iterations, respectively. The optimized parameters, however, include values which are not meaningful, such as negative probabilities. ^[See Appendix for details of both algorithms' results.] The second algorithm, brute force, was not able to converge in a computationally tractable time period. Future iterations of this simulation will explore  parallel processing as a possible solution to this issue, as brute force algorithms will allow greater control over the permitted simulation parameters, thus avoiding the issue of optimizations producing invalid parameters. The potential use of parallelization will be expanded upon in the next section. 
 
-#### Algorithmically-Optimized Parameters
+#### Selected Optimization Results (3 Iterations)
+
+Mean Error: 0.096
+
 | Name | Optimized Value | 
 |---|---|
 | `CampWeight`  | 4.266 |  
@@ -86,7 +89,7 @@ The first algorithm, the basin hopper algorithm,^[See https://docs.scipy.org/doc
 
 _Heuristic Optimization_
 
-As an alternative to algorithmic optimization, parameters were entered by hand, based upon simple heuristics (e.g., the chance of leaving a conflict zone is greater than the chance of leaving a non-conflict zone). These results are summarized below. What is notable from an initial review of these results is that the simulation does not appear to be very sensitive to parameters. 
+As an alternative to algorithmic optimization, parameters were entered by hand, based upon simple heuristics (e.g., the chance of leaving a conflict zone is greater than the chance of leaving a non-conflict zone). These results are summarized below. What is notable from an initial review of these results is that the simulation does not appear to be very sensitive to parameters, error is consistently between 8 and 10%.
 
 
 #### Selected Heuristically-Defined Parameterizations
@@ -153,7 +156,7 @@ Mean Error: 0.086
 
 #### Further Steps
 
-In the next iteration of this simulation, additional optimization algorithms will be employed and compared to simple heuristic parameterizations. In order to implement certain algorithms, such as brute force, tools such as multi-thread and parallel processing will be explored. Different and more granular validation measures will be employed to better understand the robustness of the simulation to new test data. In the next week, new data will be available from ACLED and IOM which will help to futher test the performance of the simulation. 
+In the next iteration of this simulation, additional optimization algorithms will be employed and compared to heuristic parameterizations (as above). In order to implement certain algorithms, such as brute force, tools such as multi-thread and parallel processing will be explored. Different and more granular validation measures will be employed to better understand the robustness of the simulation to new test data. In the next week, new data will be available from ACLED and IOM which will help to futher test the performance of the simulation. 
 
 
 \pagebreak
@@ -226,6 +229,9 @@ _Creation of test dataset_
 	write to file
 
 
+_Links to Code_
+
+Code used to produce the simulation environment, clean, and represent data are available at: https://github.com/tamos/MACS30200proj.
 
 
 \newpage
