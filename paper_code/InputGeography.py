@@ -1,5 +1,6 @@
 import csv
 import flee
+import pandas as pd
 
 class InputGeography:
   """
@@ -10,38 +11,30 @@ class InputGeography:
     self.links = []
 
 
-  def ReadLocationsFromCSV(self,csv_name, name_col=0, population_col=2, gps_x_col=5, gps_y_col=6):
+  def ReadLocationsFromCSV(self,csv_name):
     """
     Converts a CSV file to a locations information table 
     """
     self.locations = []
 
-    with open(csv_name, newline='') as csvfile:
-      values = csv.reader(csvfile)
+    df = pd.read_csv(csv_name)
 
-      for row in values:
-        if row[0][0] == "#":
-          pass
-        else:
-          #print(row)
-          self.locations.append([row[name_col], row[population_col], row[gps_x_col], row[gps_y_col]])
+    for row in df.itertuples():
+
+      self.locations.append([row.name, row.pop, row.lon, row.lat])
 
 
-  def ReadLinksFromCSV(self,csv_name, name1_col=0, name2_col=1, dist_col=2):
+  def ReadLinksFromCSV(self,csv_name):
     """
     Converts a CSV file to a locations information table 
     """
     self.links = []
 
-    with open(csv_name, newline='') as csvfile:
-      values = csv.reader(csvfile)
+    df = pd.read_csv(csv_name)
 
-      for row in values:
-        if row[0][0] == "#":
-          pass
-        else:
-          #print(row)
-          self.links.append([row[name1_col], row[name2_col], row[dist_col]])
+    for row in df.itertuples():
+
+      self.links.append([row.start, row.end, row.dist])
 
   def StoreInputGeographyInEcosystem(self, e):
     """

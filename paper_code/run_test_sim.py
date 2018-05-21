@@ -1,57 +1,47 @@
+from InputGeography import InputGeography
+from flee.flee import Ecosystem
+import os
+
+# plotting imports
+import matplotlib as mpl
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.cbook as cbook
+from analyze_graph import print_graph, print_graph_nx
+
+from scipy.optimize import basinhopping
+from scipy.optimize import brute, fmin
+
 
 
 def go(args):
 
-	'''	args_vals = [my_camp_weight, my_conflict_weight, 
+	'''	args_vals should be 
+	[my_camp_weight, my_conflict_weight, 
 					my_min_move, my_max_move,
 					my_conflict_move_chance,
 					my_camp_move_chance,
 					my_default_move_chance]'''
-	import pandas as pd
 
 	pd.DataFrame(args).T.to_csv('flee/my_settings.csv', 
 		header = False, index = False, sep = "|")
 
-	from InputGeography import InputGeography
-	from flee.flee import Ecosystem
-	import os
 
-	# plotting imports
-	import matplotlib as mpl
-	import numpy as np
-	import matplotlib.pyplot as plt
-	import matplotlib.cbook as cbook
-	from analyze_graph import print_graph, print_graph_nx
-
-    
 	geog = InputGeography()
-	geog.ReadLocationsFromCSV('data/location_values_init.csv',							
-							name_col = 0,
-							population_col = 3 ,
-							gps_x_col = 2,
-							gps_y_col = 1)
+	geog.ReadLocationsFromCSV(FILES["locations_init"])
 
 
-	geog.ReadLinksFromCSV(csv_name = 'data/routes_admin1.csv',
-							name1_col = 0,
-							name2_col = 1,
-							dist_col = 2)
-	#print("Geography loaded\n")
+	geog.ReadLinksFromCSV(csv_name = FILES["routes"])
 
 	e = Ecosystem()
-	#print("Ecosystem created\n")
-
-	#print("End time is: {}".format(end_time))
 
 	e, lm = geog.StoreInputGeographyInEcosystem(e)
-	#print("Geography stored in Ecosystem")
 	
 	# use lm object to look up starting place for each agent
 
-	import numpy as np 
 	lm_key = list(lm.keys())
 
-	import pandas as pd
 	res_list = {}
 	for i in lm_key:
 		if i not in res_list:
@@ -61,13 +51,10 @@ def go(args):
 		if i not in err_list:
 			err_list[i] = []
 
-	import pandas as pd
-	conflict_locations = pd.read_csv('data/conflict_locations_by_round.csv')
+	conflict_locations = pd.read_csv(FILES["conflict_locs"])
 	num_rounds = len(set(conflict_locations['round']))
 
 	for each_step in range(num_rounds):
-
-		#print("current conflict zones are", e.conflict_zone_names)
 
 		candidate_zone = conflict_locations[conflict_locations['round'] == each_step]
 		new_conflicts = set(candidate_zone.name)
@@ -77,8 +64,6 @@ def go(args):
 		peace_transition = [i for i in lm_key if i not in new_conflicts ]
 		for i in peace_transition:
 			e.remove_conflict_zone(i)
-		#print("PEACE", peace_transition)
-		#print("\nCONF:", e.conflict_zone_names)
 
 
 		num_tot = {}
@@ -92,23 +77,11 @@ def go(args):
 
 		e.evolve()
 
-		#e.printInfo()
-		#print("\n---------")
-		#print("\nTIME IS: {}".format(each_step))
-
 		loc_list = []
 		for each_location, loc_obj in lm.items():
 			#try:
 			res_list[each_location].append(loc_obj.numAgents)
 
-			#except:
-			#	pass
-		#for each_location,loc_obj in lm.items():
-		#	try:
-		#		error = abs(num_tot[each_location] - loc_obj.numAgents)
-		#		err_list[each_location].append(error)
-		#	except:
-		#		pass
 
 	results_df = pd.DataFrame(res_list)
 	results_df.to_csv('results_of_sim.csv')
@@ -116,7 +89,7 @@ def go(args):
 	results_denom = sum(results_val)
 	results_columns = list(results_df.columns)
 
-	truth_df = pd.read_csv('truth_vals.csv', skiprows =1, header = None)
+	truth_df = pd.read_csv(FILES['truth_values'], skiprows =1, header = None)
 	truth_val = [int(i) for i in truth_df.iloc[-1, :]]
 	truth_denom = sum(truth_val)
 	truth_columns = list(truth_df.iloc[0, :])
@@ -149,25 +122,32 @@ if __name__ == "__main__":
 					my_camp_move_chance,
 					my_default_move_chance]'''
 
-	from scipy.optimize import basinhopping
-	from scipy.optimize import brute, fmin
+	FILES = {"locations": 'data/settled_locations/irq_pplp_ocha_20140722.shp',
+				"routes": 'data/routes_admin1_centroids.csv',
+				"start_state_pops": 'iom_dtm_reports/d84.csv',
+				"locations_init": "data/location_values_init2.csv",
+				"conflict_data": 'data/acled_unprocessed_conflict_locations.csv',
+				"conflict_locs": 'data/conflict_locations_by_round2.csv',
+				"end_state_pops": 'iom_dtm_reports/r91.csv',
+				"truth_values": 'truth_vals.csv',
+				}
 
 	minimizer_kwargs = {"method": "BFGS"}
 
 	x0 = [5, 0.2, 10, 10, 0.1, 0.1, 0.1]
 
-	#ret = basinhopping(go, x0, 
-		#minimizer_kwargs=minimizer_kwargs,
-		#niter=10)
+	ret = basinhopping(go, x0, 
+		minimizer_kwargs=minimizer_kwargs,
+		niter=2)
 
-	rranges = (slice(0,1,0.1), slice(0, 1, 0.1),
-		       slice(0, 100, 10), slice(0, 1000, 100),
-		       slice(0, 1.0, 0.1), slice(0, 1.0, 0.1),
-		       slice(0, 1.0, 0.1))
-	ret = brute(go, rranges, disp = True)#,
+	#rranges = (slice(0,1,0.1), slice(0, 1, 0.1),
+		       #slice(0, 100, 10), slice(0, 1000, 100),
+		       #slice(0, 1.0, 0.1), slice(0, 1.0, 0.1),
+		       #slice(0, 1.0, 0.1))
+	#ret = brute(go, rranges, disp = True)#,
 					#finish = fmin)
 
-	#ret = go([2, 0.5, 300, 1000, 0.1, 0.4, 0.1])
+	#ret = go([2, 0.5, 1, 1000, 0.1, 0.9, 0.8])
 	print(ret)
 	#go_vals = [ 4.26642083e+00, -7.02500877e-03,  1.01585004e+01,  1.05621909e+01, -9.07899883e-02, -2.07080421e-01, -6.62580836e-01]
 	#go_vals = [ 5.17107326, -0.39410599,  9.92363267, 10.17238293, -0.81284913,
