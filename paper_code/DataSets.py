@@ -6,6 +6,7 @@ import geopandas as gpd
 import pandas as pd 
 from shapely.geometry import Point
 import matplotlib.pyplot as plt 
+import pickle
 
 
 class DataSets:
@@ -222,6 +223,9 @@ if __name__ == "__main__":
 
 	d = DataSets()
 	d.clean_data(files)
+
+	with open("file_locs.pickle", 'wb') as f:
+		pickle.dump(files, f, protocol=pickle.HIGHEST_PROTOCOL)
 
 
 
