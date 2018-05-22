@@ -29,6 +29,7 @@ class DataSets:
 		self.find_observed_pop_init(files)
 		self.get_conflict_locations(files)
 		self.find_observed_pop_final(files)
+		self.find_observed_pop_valid(files)
 
 
 	def get_locations(self, file_loc):
@@ -122,6 +123,32 @@ class DataSets:
 		location_csv.T.to_csv(files['truth_values'], header = True, index = False)
 
 
+
+	def find_observed_pop_valid(self, files):
+		''' Find the end-state population
+		'''
+		tmp_loc = self.locations_dissolved.copy()
+		tmp_loc['geometry'] = tmp_loc.geometry.convex_hull
+		
+		pops = pd.read_csv(files['valid_state_pops'], usecols = ['Latitude', 
+												'Longitude', 'Families',
+												 'Individuals', 'Governorate'])
+		pops = gpd.GeoDataFrame(pops)
+		pops['geometry'] = [Point(x,y) for x, y in zip(pops.Longitude, pops.Latitude)]
+		pops = pops.dissolve(by = 'Governorate', aggfunc='sum')
+		pops['geometry'] = pops.geometry.centroid
+
+		locs_w_pop = gpd.sjoin(tmp_loc, pops).reset_index()
+		locs_w_pop = locs_w_pop.dissolve('index', aggfunc = 'sum')
+		locs_w_pop = locs_w_pop.reset_index()
+
+		location_csv = pd.DataFrame()
+		location_csv['name'] = locs_w_pop['index']
+		location_csv['pop'] = locs_w_pop['Families']
+		location_csv.fillna(0, inplace = True)
+		location_csv.T.to_csv(files['valid_values'], header = True, index = False)
+
+
 	def get_conflict_locations(self, files):
 		'''Find the places which are conflict locations and at which step
 		'''
@@ -187,6 +214,9 @@ if __name__ == "__main__":
 				"conflict_data": 'data/acled_unprocessed_conflict_locations.csv',
 				"conflict_locs": 'data/conflict_locations_by_round2.csv',
 				"end_state_pops": 'iom_dtm_reports/r91.csv',
+				"valid_state_pops": 'iom_dtm_reports/r89.csv',
+				"valid_values": 'valid_vals.csv',
+				"truth_state_pops": 'iom_dtm_reports/r91.csv',
 				"truth_values": 'truth_vals.csv',
 				}
 

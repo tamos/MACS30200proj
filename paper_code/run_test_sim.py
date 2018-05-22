@@ -13,7 +13,57 @@ from analyze_graph import print_graph, print_graph_nx
 from scipy.optimize import basinhopping
 from scipy.optimize import brute, fmin
 
+from pickle import dumps
 
+
+class Simulation:
+
+	def __init__(self):
+		self.training = Training()
+		self.testing = Testing()
+
+
+class Testing:
+
+	def __init__(self):
+		self.results = None
+
+	def test(self, params):
+		self.results = go_test(params)
+		print(self.results)
+
+
+class Training:
+
+	def __init__(self):
+		self.results = {}
+
+	def basinhopper(self, minimizer_kwargs, x0, **kwargs):
+
+		self.results['basinhopping'] = basinhopping(go, x0, 
+			minimizer_kwargs=minimizer_kwargs, seed = 1234,
+			**kwargs)
+		print("Basinhopper Trained")
+
+	def brute(self, rranges, **kwargs):
+		self.results['brute'] = brute(go, rranges, **kwargs)
+		print("Brute Trained")
+
+
+
+def bad_args(args):
+	# make sure min and max are in right order
+	if args[2] < args[3]:
+		return True
+	# make sure probs are not negative
+	elif args[4] < 0:
+		return True
+	elif args[5] < 0:
+		return True
+	elif args[6] < 0:
+		return True
+	else:
+		return False
 
 def go(args):
 
@@ -23,6 +73,12 @@ def go(args):
 					my_conflict_move_chance,
 					my_camp_move_chance,
 					my_default_move_chance]'''
+
+	# first make sure args are valid, return large value if they are
+	if bad_args(args):
+		return 0.9
+
+	###### SET UP #####
 
 	pd.DataFrame(args).T.to_csv('flee/my_settings.csv', 
 		header = False, index = False, sep = "|")
@@ -52,9 +108,10 @@ def go(args):
 			err_list[i] = []
 
 	conflict_locations = pd.read_csv(FILES["conflict_locs"])
-	num_rounds = len(set(conflict_locations['round']))
 
-	for each_step in range(num_rounds):
+	###### TRAINING #####
+
+	for each_step in TRAIN_SET:
 
 		candidate_zone = conflict_locations[conflict_locations['round'] == each_step]
 		new_conflicts = set(candidate_zone.name)
@@ -65,11 +122,9 @@ def go(args):
 		for i in peace_transition:
 			e.remove_conflict_zone(i)
 
-
 		num_tot = {}
 
-
-		for each_agent in range(0, 100):
+		for each_agent in range(0, 1000):
 			place = np.random.randint(0, len(lm_key))
 			e.addAgent(location=lm[lm_key[place]])
 
@@ -77,41 +132,191 @@ def go(args):
 
 		e.evolve()
 
-		loc_list = []
 		for each_location, loc_obj in lm.items():
-			#try:
 			res_list[each_location].append(loc_obj.numAgents)
 
 
+	###### CALCULATING ERROR #####
+
 	results_df = pd.DataFrame(res_list)
-	results_df.to_csv('results_of_sim.csv')
+	results_df.to_csv('raw_results_of_sim.csv')
+
+	# Get the validation values
+	truth_df = pd.read_csv(FILES['valid_values'], skiprows =1, header = None)
+
+	# Get the number of observed families
+	truth_val = [int(i) for i in truth_df.iloc[-1, :]]
+
+	# Get the total number of observed families
+	truth_denom = sum(truth_val)
+
+	# Get the locations of the families
+	truth_columns = list(truth_df.iloc[0, :])
+
+	# account for missing counts in truth 
+
+	results_keep = [i for i in results_df.columns if i in truth_columns]
+
+	results_df = results_df[results_keep]
+
+	# Get the number of agents in each location 
 	results_val = [int(i) for i in results_df.iloc[-1,:]]
+
+	# Find the total number of agents
 	results_denom = sum(results_val)
+
+	# Get the locations of the agents
 	results_columns = list(results_df.columns)
 
-	truth_df = pd.read_csv(FILES['truth_values'], skiprows =1, header = None)
-	truth_val = [int(i) for i in truth_df.iloc[-1, :]]
-	truth_denom = sum(truth_val)
-	truth_columns = list(truth_df.iloc[0, :])
+	# Create two dicts, with 'location': # agents(or families)/ total num of agents (or families)
 
 	truth_dict = dict(zip(truth_columns, [i/truth_denom for i in truth_val]))
 	result_dict = dict(zip(results_columns, [i/results_denom for i in results_val]))
+
 	error_list = []
 	error_places = []
 
+	# Now compare and see how we did
+
 	for result_key, result_item in result_dict.items():
-		#print(result_key, "AGSINST", truth_dict)
 		if result_key in truth_dict:
 			error = abs(truth_dict[result_key] - result_item)
-			print("for {}, error is {}".format(result_key, error))
 			error_list.append(error)
 			error_places.append(result_key)
 		else:
 			pass
-			#error = result_item
-	pd.DataFrame([error_places, error_list]).T.to_csv('errors_results.csv')
-	return np.mean(error_list)
 
+	# Write the results to a csv
+	#pd.DataFrame([error_places, error_list]).T.to_csv('errors_results.csv')
+
+	# Return the mean absolute error to 3 places
+	return round(np.mean(error_list), 3)
+
+
+
+def go_test(args):
+	'''	args_vals should be 
+	[my_camp_weight, my_conflict_weight, 
+					my_min_move, my_max_move,
+					my_conflict_move_chance,
+					my_camp_move_chance,
+					my_default_move_chance]'''
+
+	# first make sure args are valid, return large value if they are
+
+	###### SET UP #####
+
+	pd.DataFrame(args).T.to_csv('flee/my_settings.csv', 
+		header = False, index = False, sep = "|")
+
+
+	geog = InputGeography()
+	geog.ReadLocationsFromCSV(FILES["truth_state_pops"])
+
+
+	geog.ReadLinksFromCSV(csv_name = FILES["routes"])
+
+	e = Ecosystem()
+
+	e, lm = geog.StoreInputGeographyInEcosystem(e)
+	
+	# use lm object to look up starting place for each agent
+
+	lm_key = list(lm.keys())
+
+	res_list = {}
+	for i in lm_key:
+		if i not in res_list:
+			res_list[i] = []
+	err_list = {}
+	for i in lm_key:
+		if i not in err_list:
+			err_list[i] = []
+
+	conflict_locations = pd.read_csv(FILES["conflict_locs"])
+
+	###### TRAINING #####
+
+	for each_step in TEST_SET:
+
+		candidate_zone = conflict_locations[conflict_locations['round'] == each_step]
+		new_conflicts = set(candidate_zone.name)
+		for i in new_conflicts:
+			if i not in e.conflict_zone_names:
+				e.add_conflict_zone(i)
+		peace_transition = [i for i in lm_key if i not in new_conflicts ]
+		for i in peace_transition:
+			e.remove_conflict_zone(i)
+
+		num_tot = {}
+
+		for each_agent in range(0, 1000):
+			place = np.random.randint(0, len(lm_key))
+			e.addAgent(location=lm[lm_key[place]])
+
+		e.refresh_conflict_weights()
+
+		e.evolve()
+
+		for each_location, loc_obj in lm.items():
+			res_list[each_location].append(loc_obj.numAgents)
+
+
+	###### CALCULATING ERROR #####
+
+	results_df = pd.DataFrame(res_list)
+	results_df.to_csv('test_results_of_sim.csv')
+
+	# Get the validation values
+	truth_df = pd.read_csv(FILES['truth_values'], skiprows =1, header = None)
+
+	# Get the number of observed families
+	truth_val = [int(i) for i in truth_df.iloc[-1, :]]
+
+	# Get the total number of observed families
+	truth_denom = sum(truth_val)
+
+	# Get the locations of the families
+	truth_columns = list(truth_df.iloc[0, :])
+
+	# account for missing counts in truth 
+
+	results_keep = [i for i in results_df.columns if i in truth_columns]
+
+	results_df = results_df[results_keep]
+
+	# Get the number of agents in each location 
+	results_val = [int(i) for i in results_df.iloc[-1,:]]
+
+	# Find the total number of agents
+	results_denom = sum(results_val)
+
+	# Get the locations of the agents
+	results_columns = list(results_df.columns)
+
+	# Create two dicts, with 'location': # agents(or families)/ total num of agents (or families)
+
+	truth_dict = dict(zip(truth_columns, [i/truth_denom for i in truth_val]))
+	result_dict = dict(zip(results_columns, [i/results_denom for i in results_val]))
+
+	error_list = []
+	error_places = []
+
+	# Now compare and see how we did
+
+	for result_key, result_item in result_dict.items():
+		if result_key in truth_dict:
+			error = abs(truth_dict[result_key] - result_item)
+			error_list.append(error)
+			error_places.append(result_key)
+		else:
+			pass
+
+	# Write the results to a csv
+	pd.DataFrame([error_places, error_list]).T.to_csv('test_errors_results.csv')
+
+	# Return the mean absolute error
+	return np.mean(error_list)
 
 
 if __name__ == "__main__":
@@ -129,32 +334,55 @@ if __name__ == "__main__":
 				"conflict_data": 'data/acled_unprocessed_conflict_locations.csv',
 				"conflict_locs": 'data/conflict_locations_by_round2.csv',
 				"end_state_pops": 'iom_dtm_reports/r91.csv',
+				"valid_state_pops": 'iom_dtm_reports/r89.csv',
+				"valid_values": 'valid_vals.csv',
+				"truth_state_pops": 'iom_dtm_reports/r89.csv',
 				"truth_values": 'truth_vals.csv',
 				}
+
+	conflict_locations = pd.read_csv(FILES["conflict_locs"])
+	num_rounds = len(set(conflict_locations['round']))
+
+	#### The rounds we are examining ####
+	train_start = 84
+	train_end = 89
+	test_start = 90
+	test_end = 91
+
+	TRAIN_SET = range(train_end - train_start)
+	start_val = max(TRAIN_SET)
+	TEST_SET = range(start_val, start_val + (test_end - test_start) + 1)
+
+	s = Simulation()
 
 	minimizer_kwargs = {"method": "BFGS"}
 
 	x0 = [5, 0.2, 10, 10, 0.1, 0.1, 0.1]
 
-	ret = basinhopping(go, x0, 
-		minimizer_kwargs=minimizer_kwargs,
-		niter=2)
+	print("STARTING OPTIMIZATION")
 
-	#rranges = (slice(0,1,0.1), slice(0, 1, 0.1),
-		       #slice(0, 100, 10), slice(0, 1000, 100),
-		       #slice(0, 1.0, 0.1), slice(0, 1.0, 0.1),
-		       #slice(0, 1.0, 0.1))
-	#ret = brute(go, rranges, disp = True)#,
-					#finish = fmin)
+	s.training.basinhopper(minimizer_kwargs, x0, niter=2)
 
-	#ret = go([2, 0.5, 1, 1000, 0.1, 0.9, 0.8])
-	print(ret)
-	#go_vals = [ 4.26642083e+00, -7.02500877e-03,  1.01585004e+01,  1.05621909e+01, -9.07899883e-02, -2.07080421e-01, -6.62580836e-01]
-	#go_vals = [ 5.17107326, -0.39410599,  9.92363267, 10.17238293, -0.81284913,
-        #0.67581873,  0.37396598]
+	print("OPTIMIZATION RESULTS FOR BASINHOPPING: {} \nBEST PARAMS: {}\n".format(s.training.results['basinhopping'].message,
+											s.training.results['basinhopping'].x))
 
-	#print("BEST PARAMS", ret[0])
-	#print("PROVIDE ERROR OF", go(go_vals))
+	rranges = (slice(0,1,0.25), slice(0, 1, 0.25),
+		slice(0, 100, 10), slice(0, 1000, 100),
+		slice(0, 1.0, 0.25), slice(0, 1.0, 0.25),
+		slice(0, 1.0, 0.25))
 
-	#print("global minimum: x = %.4f, f(x0) = %.4f" % (ret.x, ret.fun))
+	s.training.brute(rranges)
+
+	print("OPTIMIZATION RESULTS FOR BRUTE: {} \nBEST PARAMS: {}\n".format(s.training.results['brute'][0],
+											s.training.results['brute'][1]))
+
+	print("TESTING BASINHOP")
+	s.testing(s.training.results['basinhopping'].x)
+
+	print("TESTING BRUTE")
+	s.testing(s.training.results['brute'][0])
+
+	with open("results_summary.obj") as f:
+		dump(s, f)
+
 
