@@ -304,6 +304,8 @@ def go(args):
 
 
 def bad_args(args):
+	''' Catch bad arguments
+	'''
 	# make sure min and max are in right order
 	if args[2] > args[3]:
 		return True
@@ -364,7 +366,7 @@ if __name__ == "__main__":
 											#s.training.results['basinhopping'].x))
 
 	#print("TESTING BASINHOP")
-	#s.testing(s.training.results['basinhopping'].x)
+	#s.testing.test(s.training.results['basinhopping'].x)
 
 	#with open("basin_results_summary.obj", 'wb') as f:
 		#pickle.dump(s, f)
@@ -384,25 +386,76 @@ if __name__ == "__main__":
 											#s.training.results['brute'][1]))
 
 	#print("TESTING BRUTE")
-	#s.testing(s.training.results['brute'][0])
+	#s.testing.test(s.training.results['brute'][0])
 
 	#with open("brute_results_summary.obj", 'wb') as f:
 		#pickle.dump(s, f)
 
 	###########################
-	#### SIMPLE MINIMIZER ####
+	#### SIMPLE MINIMIZER #####
 	###########################
 
 	#s.training.vanilla_minimizer(x0)
 
 	#print("OPTIMIZATION RESULTS FOR VANILLA MINIMIZER: {} \nBEST PARAMS: {}\n".format(s.training.results['vanilla_minimizer'].message,
-											#s.training.results['vanilla_minimizer'].x))
+	#										s.training.results['vanilla_minimizer'].x))
 
 	#print("TESTING VANILLA MINIMIZER")
 
 	#s.testing.test(s.training.results['vanilla_minimizer'].x)
-	
+
 	#with open("vanilla_results_summary.obj", 'wb') as f:
-		#pickle.dump(s, f)
+	#	pickle.dump(s, f)
 
 
+	###########################
+	#### Heuristic ###########
+	###########################
+
+	print("TESTING HEURISTIC")
+	x0 = [1.0, # my_camp_weight
+		 0.25, # my_conflict_weight
+		0.5, # my_min_move
+		5.0, # my_max_move
+		1.0, # my_conflict_move_chance
+		0.1, # my_camp_move_chance
+		0.3] # my_default_move_chance
+
+	print(x0)
+	s.testing.test(x0)
+
+	print("TESTING HEURISTIC")
+	x0 = [0.8, # my_camp_weight
+		 0.1, # my_conflict_weight
+		0.2, # my_min_move
+		10.0, # my_max_move
+		0.7, # my_conflict_move_chance
+		0.1, # my_camp_move_chance
+		0.3] # my_default_move_chance
+
+	print(x0)
+	s.testing.test(x0)
+
+	print("TESTING HEURISTIC")
+	x0 = [0.7, # my_camp_weight
+		 0.01, # my_conflict_weight
+		0.2, # my_min_move
+		10.0, # my_max_move
+		0.7, # my_conflict_move_chance
+		0.1, # my_camp_move_chance
+		0.3] # my_default_move_chance
+
+	print(x0)
+	s.testing.test(x0)
+
+	print("TESTING HEURISTIC")
+	x0 = [0.6, # my_camp_weight
+		 0.01, # my_conflict_weight
+		0.2, # my_min_move
+		10.0, # my_max_move
+		0.7, # my_conflict_move_chance
+		0.1, # my_camp_move_chance
+		0.3] # my_default_move_chance
+
+	print(x0)
+	s.testing.test(x0)

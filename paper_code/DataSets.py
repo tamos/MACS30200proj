@@ -35,7 +35,6 @@ class DataSets:
 		self.make_training_data(files["training_pops"], files["training_file"])
 		self.make_training_data(files["test_pops"], files["test_file"])
 
-
 	def get_locations(self, file_loc):
 		self.locations = gpd.read_file(file_loc)
 
@@ -137,6 +136,7 @@ class DataSets:
 		self.starting_pops['pop'] = locs_w_pop['Families']
 
 		# We must also make sure we have all locations, so load up the initial network
+		# take the places from the intial network if we are missing them
 
 		df = pd.read_csv(files['locations_init'])
 		tmp_df = []
