@@ -19,18 +19,21 @@ class DataSets:
 		self.routes = None
 		self.starting_pops = None
 		self.locs_w_pop = None
+		self.test_start_pops = None
 
 
 	def clean_data(self, files):
 		'''Clean data by running successive functions. 
 		'''
-		self.get_locations(files['locations'])
-		self.dissolve_locations()
-		self.calc_distances(files['routes'])
-		self.find_observed_pop_init(files)
-		self.get_conflict_locations(files)
-		self.find_observed_pop_final(files)
-		self.find_observed_pop_valid(files)
+		self.get_locations(files['locations']) # list of locations
+		self.dissolve_locations() # geospatial manipulation
+		self.calc_distances(files['routes']) # find istance between locations
+		self.find_observed_pop_init(files) # get starding IDP pops
+		self.get_conflict_locations(files) # find conflict locations
+		self.find_observed_pop_test(files) # get starting pops for testing
+		# aggregate data for training and testing to calculate MASE
+		self.make_training_data(files["training_pops"], files["training_file"])
+		self.make_training_data(files["test_pops"], files["test_file"])
 
 
 	def get_locations(self, file_loc):
@@ -71,7 +74,7 @@ class DataSets:
 		tmp_loc = self.locations_dissolved.copy()
 		tmp_loc['geometry'] = tmp_loc.geometry.convex_hull
 
-		pops = pd.read_csv(files['start_state_pops'], 
+		pops = pd.read_csv(files['observed_pop_init'], 
 							usecols  = ['Latitude', 'Longitude', 'Families', 
 										'Individuals', 'District'])
 		pops = gpd.GeoDataFrame(pops)
@@ -99,55 +102,56 @@ class DataSets:
 
 		self.starting_pops.to_csv(files['locations_init'])
 
-	def find_observed_pop_final(self, files):
-		''' Find the end-state population
+
+
+	def find_observed_pop_test(self, files):
+		'''Find the test population starting point
 		'''
 		tmp_loc = self.locations_dissolved.copy()
 		tmp_loc['geometry'] = tmp_loc.geometry.convex_hull
-		
-		pops = pd.read_csv(files['end_state_pops'], usecols = ['Latitude', 
-												'Longitude', 'Families',
-												 'Individuals', 'Governorate'])
+
+		pops = pd.read_csv(files['test_pop_init'], 
+							usecols  = ['Latitude', 'Longitude', 'Families', 
+										'Individuals', 'District'])
 		pops = gpd.GeoDataFrame(pops)
+		pops.crs = tmp_loc.crs
 		pops['geometry'] = [Point(x,y) for x, y in zip(pops.Longitude, pops.Latitude)]
-		pops = pops.dissolve(by = 'Governorate', aggfunc='sum')
+		
+
+
+		pops = pops[['District', 'geometry', 'Families', 'Individuals']]
+		pops = pops.dissolve(by = 'District', aggfunc = 'sum')
 		pops['geometry'] = pops.geometry.centroid
 
 		locs_w_pop = gpd.sjoin(tmp_loc, pops).reset_index()
 		locs_w_pop = locs_w_pop.dissolve('index', aggfunc = 'sum')
 		locs_w_pop = locs_w_pop.reset_index()
 
-		location_csv = pd.DataFrame()
-		location_csv['name'] = locs_w_pop['index']
-		location_csv['pop'] = locs_w_pop['Families']
-		location_csv.fillna(0, inplace = True)
-		location_csv.T.to_csv(files['truth_values'], header = True, index = False)
+		self.locs_w_pop = locs_w_pop
 
+		self.starting_pops = pd.DataFrame()
+		geoms = self.locs_w_pop.geometry.centroid
+		self.starting_pops['name'] = locs_w_pop['index']
+		self.starting_pops['lat'] = [i.y for i in geoms]
+		self.starting_pops['lon'] = [i.x for i in geoms]
+		self.starting_pops['pop'] = locs_w_pop['Families']
 
+		# We must also make sure we have all locations, so load up the initial network
 
-	def find_observed_pop_valid(self, files):
-		''' Find the end-state population
-		'''
-		tmp_loc = self.locations_dissolved.copy()
-		tmp_loc['geometry'] = tmp_loc.geometry.convex_hull
-		
-		pops = pd.read_csv(files['valid_state_pops'], usecols = ['Latitude', 
-												'Longitude', 'Families',
-												 'Individuals', 'Governorate'])
-		pops = gpd.GeoDataFrame(pops)
-		pops['geometry'] = [Point(x,y) for x, y in zip(pops.Longitude, pops.Latitude)]
-		pops = pops.dissolve(by = 'Governorate', aggfunc='sum')
-		pops['geometry'] = pops.geometry.centroid
+		df = pd.read_csv(files['locations_init'])
+		tmp_df = []
+		names = set()
+		for i in self.starting_pops.itertuples():
+				tmp_df.append(list(i))
+				names.add(i.name)
 
-		locs_w_pop = gpd.sjoin(tmp_loc, pops).reset_index()
-		locs_w_pop = locs_w_pop.dissolve('index', aggfunc = 'sum')
-		locs_w_pop = locs_w_pop.reset_index()
+		for i in df.itertuples():
+			if i.name not in names:
+				tmp_df.append(list(i[1:]))
+		self.test_start_pops = pd.DataFrame(tmp_df)
+		self.test_start_pops.columns = df.columns
 
-		location_csv = pd.DataFrame()
-		location_csv['name'] = locs_w_pop['index']
-		location_csv['pop'] = locs_w_pop['Families']
-		location_csv.fillna(0, inplace = True)
-		location_csv.T.to_csv(files['valid_values'], header = True, index = False)
+		self.test_start_pops.to_csv(files['test_locs_init'])
 
 
 	def get_conflict_locations(self, files):
@@ -176,7 +180,34 @@ class DataSets:
 
 		locs.to_csv(files['conflict_locs'])
 
+	def make_training_data(self, file_list, outfile):
 
+		master_df = {}
+
+		for i in file_list:
+
+			tmp_loc = self.locations_dissolved.copy()
+			tmp_loc['geometry'] = tmp_loc.geometry.convex_hull
+			
+			pops = pd.read_csv(i[1], usecols = ['Latitude', 
+													'Longitude', 'Families',
+													 'Individuals', 'Governorate'])
+			pops = gpd.GeoDataFrame(pops)
+			pops['geometry'] = [Point(x,y) for x, y in zip(pops.Longitude, pops.Latitude)]
+			pops = pops.dissolve(by = 'Governorate', aggfunc='sum')
+			pops['geometry'] = pops.geometry.centroid
+
+			locs_w_pop = gpd.sjoin(tmp_loc, pops).reset_index()
+			locs_w_pop = locs_w_pop.dissolve('index', aggfunc = 'sum')
+			locs_w_pop = locs_w_pop.reset_index()
+
+			for j in locs_w_pop.itertuples():
+				if j.index not in master_df:
+					master_df[j.index] = []
+				master_df[j.index].append(j.Families)
+
+		pd.DataFrame(master_df).to_csv(outfile, index = False)
+		
 
 def assign_round(new_x):
     '''Helper to assign rounds correctly
@@ -210,15 +241,28 @@ if __name__ == "__main__":
 
 	files = {"locations": 'data/settled_locations/irq_pplp_ocha_20140722.shp',
 				"routes": 'data/routes_admin1_centroids.csv',
-				"start_state_pops": 'iom_dtm_reports/d84.csv',
+
+				"observed_pop_init": 'iom_dtm_reports/d84.csv',
 				"locations_init": "data/location_values_init2.csv",
+
 				"conflict_data": 'data/acled_unprocessed_conflict_locations.csv',
 				"conflict_locs": 'data/conflict_locations_by_round2.csv',
-				"end_state_pops": 'iom_dtm_reports/r91.csv',
-				"valid_state_pops": 'iom_dtm_reports/r89.csv',
-				"valid_values": 'valid_vals.csv',
-				"truth_state_pops": 'iom_dtm_reports/r91.csv',
-				"truth_values": 'truth_vals.csv',
+
+				"training_pops": [(85, 'iom_dtm_reports/d85.csv'),
+								(86, 'iom_dtm_reports/d86.csv'),
+								(87, 'iom_dtm_reports/d87.csv'),
+								(88, 'iom_dtm_reports/d88.csv')],
+
+				"training_file": "train_values.csv",
+
+				"test_pop_init": 'iom_dtm_reports/r89.csv',
+				"test_locs_init": 'data/test_locs_init.csv',
+
+				"test_pops": [(89, 'iom_dtm_reports/d89.csv'),
+							(90, 'iom_dtm_reports/d89.csv'),
+							(91, 'iom_dtm_reports/d89.csv')],
+
+				"test_file": "test_values.csv",
 				}
 
 	d = DataSets()
